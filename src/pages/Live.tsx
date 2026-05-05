@@ -11,7 +11,7 @@ import {
   X,
   Maximize2,
   Minimize2,
-  AlertTriangle,
+  ExternalLink,
 } from 'lucide-react';
 import MatchCard from '../components/MatchCard';
 import { getLiveMatch, getUpcomingMatches } from '../services/api';
@@ -24,7 +24,6 @@ export default function Live() {
   const [loading, setLoading] = useState(true);
   const [selectedStream, setSelectedStream] = useState<StreamSource | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [iframeError, setIframeError] = useState(false);
   const playerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -38,10 +37,6 @@ export default function Live() {
     const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, []);
-
-  useEffect(() => {
-    setIframeError(false);
-  }, [selectedStream]);
 
   useEffect(() => {
     function onFullscreenChange() {
@@ -59,6 +54,13 @@ export default function Live() {
       document.exitFullscreen();
     }
   }
+
+  function closePlayer() {
+    setSelectedStream(null);
+    if (document.fullscreenElement) document.exitFullscreen();
+  }
+
+  const hasEmbedUrl = (stream: StreamSource) => !!stream.embedUrl;
 
   const officialStreams = streamSources.filter((s) => s.type === 'official');
   const freeStreams = streamSources.filter((s) => s.type === 'free');
@@ -80,7 +82,7 @@ export default function Live() {
       </div>
 
       {liveMatch ? (
-        <div className="mb-8">
+        <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">
             <span className="live-dot" />
             <h2 className="text-lg font-bold text-red-400">Match In Progress</h2>
@@ -90,7 +92,7 @@ export default function Live() {
           </div>
         </div>
       ) : nextMatch ? (
-        <div className="ahly-gradient-subtle border border-ahly-red/20 rounded-2xl p-6 mb-8">
+        <div className="ahly-gradient-subtle border border-ahly-red/20 rounded-2xl p-6 mb-6">
           <div className="flex items-center gap-2 mb-2">
             <Clock className="w-5 h-5 text-ahly-muted" />
             <span className="text-sm text-ahly-muted">No Live Match Right Now</span>
@@ -103,23 +105,28 @@ export default function Live() {
           </div>
         </div>
       ) : (
-        <div className="glass-card p-8 text-center mb-8">
+        <div className="glass-card p-8 text-center mb-6">
           <WifiOff className="w-12 h-12 text-ahly-muted mx-auto mb-3" />
           <h2 className="text-lg font-semibold text-white mb-1">No Upcoming Matches</h2>
           <p className="text-sm text-ahly-muted">Check back later for live match updates.</p>
         </div>
       )}
 
+      {/* Embedded Player */}
       {selectedStream && (
         <div
           ref={playerRef}
-          className={`glass-card mb-8 border-ahly-red/30 overflow-hidden ${
+          className={`glass-card mb-6 border-ahly-red/30 overflow-hidden ${
             isFullscreen ? 'fixed inset-0 z-[100] rounded-none border-none' : ''
           }`}
         >
+          {/* Player Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-ahly-dark/90 border-b border-ahly-border">
             <div className="flex items-center gap-3">
-              <Play className="w-4 h-4 text-ahly-red" />
+              <div className="flex items-center gap-1.5">
+                <span className="live-dot" />
+                <Play className="w-4 h-4 text-ahly-red" />
+              </div>
               <span className="text-sm font-semibold text-white">
                 {selectedStream.name}
               </span>
@@ -127,23 +134,18 @@ export default function Live() {
                 {selectedStream.quality}
               </span>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
+              {hasEmbedUrl(selectedStream) && (
+                <button
+                  onClick={toggleFullscreen}
+                  className="p-1.5 rounded-md hover:bg-ahly-card text-ahly-muted hover:text-white transition-colors"
+                  title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+                >
+                  {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+                </button>
+              )}
               <button
-                onClick={toggleFullscreen}
-                className="p-1.5 rounded-md hover:bg-ahly-card text-ahly-muted hover:text-white transition-colors"
-                title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-              >
-                {isFullscreen ? (
-                  <Minimize2 className="w-4 h-4" />
-                ) : (
-                  <Maximize2 className="w-4 h-4" />
-                )}
-              </button>
-              <button
-                onClick={() => {
-                  setSelectedStream(null);
-                  if (document.fullscreenElement) document.exitFullscreen();
-                }}
+                onClick={closePlayer}
                 className="p-1.5 rounded-md hover:bg-red-500/20 text-ahly-muted hover:text-red-400 transition-colors"
                 title="Close player"
               >
@@ -152,55 +154,53 @@ export default function Live() {
             </div>
           </div>
 
-          <div
-            className={`relative bg-black ${
-              isFullscreen ? 'h-[calc(100vh-48px)]' : 'aspect-video'
-            }`}
-          >
-            {iframeError ? (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-ahly-dark">
-                <AlertTriangle className="w-12 h-12 text-yellow-500 mb-3" />
-                <p className="text-white font-medium mb-1">
-                  This source cannot be embedded directly
-                </p>
-                <p className="text-ahly-muted text-sm mb-4 text-center max-w-md">
-                  Some streaming sites block embedding. The stream will open in a new panel below.
-                </p>
-                <a
-                  href={selectedStream.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-5 py-2.5 ahly-gradient rounded-lg text-white text-sm font-medium hover:opacity-90 transition-opacity"
-                >
-                  <Play className="w-4 h-4" />
-                  Open in New Tab
-                </a>
-              </div>
+          {/* Player Content */}
+          <div className={`relative bg-black ${isFullscreen ? 'h-[calc(100vh-48px)]' : 'aspect-video'}`}>
+            {hasEmbedUrl(selectedStream) ? (
+              <iframe
+                key={selectedStream.embedUrl}
+                src={selectedStream.embedUrl}
+                className="w-full h-full border-0"
+                allow="autoplay; fullscreen; encrypted-media; picture-in-picture; accelerometer; gyroscope"
+                allowFullScreen
+                referrerPolicy="no-referrer"
+                title={`Stream - ${selectedStream.name}`}
+              />
             ) : (
               <iframe
-                src={selectedStream.embedUrl || selectedStream.url}
+                key={selectedStream.url}
+                src={selectedStream.url}
                 className="w-full h-full border-0"
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture"
+                sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-popups-to-escape-sandbox"
+                allow="autoplay; fullscreen; encrypted-media"
                 allowFullScreen
-                sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation"
+                referrerPolicy="no-referrer"
                 title={`Stream - ${selectedStream.name}`}
-                onError={() => setIframeError(true)}
-                onLoad={(e) => {
-                  try {
-                    const iframe = e.target as HTMLIFrameElement;
-                    if (!iframe.contentDocument && !iframe.contentWindow) {
-                      setIframeError(true);
-                    }
-                  } catch {
-                    // cross-origin frame - expected, stream is loading
-                  }
-                }}
               />
             )}
+          </div>
+
+          {/* Player Footer */}
+          <div className="px-4 py-2 bg-ahly-dark/90 border-t border-ahly-border flex items-center justify-between">
+            <span className="text-xs text-ahly-muted">
+              {hasEmbedUrl(selectedStream)
+                ? 'YouTube embed - best compatibility'
+                : 'Embedded stream - if blocked, use "Open in new tab"'}
+            </span>
+            <a
+              href={selectedStream.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-xs text-ahly-red hover:text-ahly-gold transition-colors"
+            >
+              <ExternalLink className="w-3 h-3" />
+              Open in new tab
+            </a>
           </div>
         </div>
       )}
 
+      {/* Stream Sources Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StreamSection
           title="Official Channels"
@@ -231,6 +231,7 @@ export default function Live() {
         />
       </div>
 
+      {/* How to Watch */}
       <div className="mt-8 glass-card p-5">
         <div className="flex items-center gap-2 mb-3">
           <Radio className="w-4 h-4 text-ahly-red" />
@@ -243,14 +244,16 @@ export default function Live() {
               <li>- OnTime Sports (Free-to-air for Egyptian League)</li>
               <li>- beIN Sports (CAF Champions League)</li>
               <li>- TOD TV (streaming platform)</li>
+              <li>- Al Ahly TV on YouTube (official)</li>
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-medium mb-1">International</h4>
+            <h4 className="text-white font-medium mb-1">Free Online</h4>
             <ul className="space-y-1">
-              <li>- beIN Sports Connect (MENA region)</li>
-              <li>- YouTube (selected matches)</li>
-              <li>- CAF TV (continental competitions)</li>
+              <li>- Yalla Shoot (Arabic commentary)</li>
+              <li>- Koora Live (HD streams)</li>
+              <li>- Match Koora Live (multiple servers)</li>
+              <li>- Koora Mobasher (live matches)</li>
             </ul>
           </div>
         </div>
@@ -285,6 +288,7 @@ function StreamSection({
       <div className="space-y-2">
         {streams.map((stream, i) => {
           const isActive = selected?.name === stream.name;
+          const isEmbeddable = !!stream.embedUrl;
           return (
             <button
               key={i}
@@ -313,6 +317,7 @@ function StreamSection({
                   </p>
                   <p className="text-xs text-ahly-muted">
                     {stream.quality} - {stream.language}
+                    {isEmbeddable && ' - Embeddable'}
                   </p>
                 </div>
               </div>

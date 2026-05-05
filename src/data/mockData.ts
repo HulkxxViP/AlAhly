@@ -1,10 +1,10 @@
 import { Match, Standing, NewsItem, Player, Competition, StreamSource, TeamStats } from '../types';
 
 export const AHLY_TEAM = {
-  id: 1026,
-  name: 'Al Ahly SC',
+  id: 1577,
+  name: 'Al Ahly',
   nameAr: 'النادي الأهلي',
-  logo: 'https://media.api-sports.io/football/teams/1026.png',
+  logo: 'https://media.api-sports.io/football/teams/1577.png',
   isAhly: true,
 };
 
@@ -330,14 +330,16 @@ export const squad: Player[] = [
 ];
 
 export const streamSources: StreamSource[] = [
-  { name: 'OnTime Sports', url: 'https://www.ontimesports.com', embedUrl: 'https://www.ontimesports.com', quality: 'HD', language: 'Arabic', type: 'official' },
-  { name: 'beIN SPORTS', url: 'https://www.bein.com', embedUrl: 'https://www.bein.com', quality: 'HD', language: 'Arabic/English', type: 'premium' },
-  { name: 'YouTube - Al Ahly Official', url: 'https://www.youtube.com/@AlAhlySC', embedUrl: 'https://www.youtube.com/embed/live_stream?channel=UCz0x4IRBXY28TRFwR_v0xmg', quality: 'HD', language: 'Arabic', type: 'official' },
-  { name: 'TOD TV', url: 'https://www.tod.tv', embedUrl: 'https://www.tod.tv', quality: 'HD', language: 'Arabic', type: 'premium' },
-  { name: 'FilGoal Live', url: 'https://www.filgoal.com', embedUrl: 'https://www.filgoal.com', quality: 'SD', language: 'Arabic', type: 'free' },
-  { name: 'Yalla Shoot', url: 'https://www.yalla-shoot.com', embedUrl: 'https://www.yalla-shoot.com', quality: 'SD', language: 'Arabic', type: 'free' },
-  { name: 'Kora Star', url: 'https://www.korastar.tv', embedUrl: 'https://www.korastar.tv', quality: 'SD', language: 'Arabic', type: 'free' },
-  { name: 'Kora Online', url: 'https://www.koraonline.com', embedUrl: 'https://www.koraonline.com', quality: 'SD', language: 'Arabic', type: 'free' },
+  { name: 'Al Ahly TV - YouTube', url: 'https://www.youtube.com/@AlAHLYTVCHANNEL/streams', embedUrl: 'https://www.youtube.com/embed/live_stream?channel=UCmeqakSoEdmxEtTnCFSbunw', quality: 'HD', language: 'Arabic', type: 'official' },
+  { name: 'Al Ahly Live - YouTube', url: 'https://www.youtube.com/channel/UCJS7o74pnjIzyAXjEJ1-58Q', embedUrl: 'https://www.youtube.com/embed/live_stream?channel=UCJS7o74pnjIzyAXjEJ1-58Q', quality: 'HD', language: 'Arabic', type: 'official' },
+  { name: 'Yalla Shoot', url: 'https://yalla-shoots.mov/', quality: 'HD', language: 'Arabic', type: 'free' },
+  { name: 'Koora Live', url: 'https://kooralives.fit/', quality: 'HD', language: 'Arabic', type: 'free' },
+  { name: 'Koora Live TV', url: 'https://koray.live/', quality: '4K', language: 'Arabic', type: 'free' },
+  { name: 'Koora Mobasher', url: 'https://www.koooramobasher.online/home/', quality: 'HD', language: 'Arabic', type: 'free' },
+  { name: 'Match Koora Live', url: 'https://www.matchkoralive.com/', quality: 'HD', language: 'Arabic', type: 'free' },
+  { name: 'beIN SPORTS', url: 'https://www.bein.com/en/', quality: 'HD', language: 'Arabic/English', type: 'premium' },
+  { name: 'TOD TV', url: 'https://www.tod.tv', quality: 'HD', language: 'Arabic', type: 'premium' },
+  { name: 'OnTime Sports', url: 'https://www.ontimesports.com', quality: 'HD', language: 'Arabic', type: 'official' },
 ];
 
 export const teamStats: TeamStats = {

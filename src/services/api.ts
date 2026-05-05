@@ -11,9 +11,8 @@ import {
 
 const API_KEY = import.meta.env.VITE_API_FOOTBALL_KEY;
 const BASE_URL = 'https://v3.football.api-sports.io';
-const AHLY_TEAM_ID = 1026;
+const AHLY_TEAM_ID = 1577;
 const EGYPTIAN_LEAGUE_ID = 233;
-const CURRENT_SEASON = 2025;
 
 const apiClient = axios.create({
   baseURL: BASE_URL,
@@ -24,10 +23,11 @@ const apiClient = axios.create({
 
 const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_DURATION = 10 * 60 * 1000;
+const LIVE_CACHE_DURATION = 30 * 1000;
 
-async function cachedRequest<T>(key: string, fetcher: () => Promise<T>): Promise<T> {
+async function cachedRequest<T>(key: string, fetcher: () => Promise<T>, ttl = CACHE_DURATION): Promise<T> {
   const cached = cache.get(key);
-  if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
+  if (cached && Date.now() - cached.timestamp < ttl) {
     return cached.data as T;
   }
   const data = await fetcher();
@@ -39,18 +39,40 @@ function isLiveMode(): boolean {
   return !!API_KEY && API_KEY !== 'your_api_key_here';
 }
 
+function getSeasonForApi(): number {
+  // Free plan only supports 2022-2024 seasons
+  return 2024;
+}
+
+function formatDate(date: Date): string {
+  return date.toISOString().split('T')[0];
+}
+
 export async function getRecentMatches(): Promise<Match[]> {
   if (!isLiveMode()) return recentMatches;
 
   return cachedRequest('recent_matches', async () => {
     try {
+      const today = new Date();
+      const threeMonthsAgo = new Date(today);
+      threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
       const { data } = await apiClient.get('/fixtures', {
         params: {
           team: AHLY_TEAM_ID,
-          last: 10,
+          season: getSeasonForApi(),
+          from: formatDate(threeMonthsAgo),
+          to: formatDate(today),
+          status: 'FT-AET-PEN',
         },
       });
-      return mapApiFixtures(data.response || []);
+
+      const results = data.response || [];
+      if (results.length > 0) {
+        const mapped = mapApiFixtures(results);
+        return mapped.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()).slice(0, 10);
+      }
+      return recentMatches;
     } catch {
       return recentMatches;
     }
@@ -62,13 +84,26 @@ export async function getUpcomingMatches(): Promise<Match[]> {
 
   return cachedRequest('upcoming_matches', async () => {
     try {
+      const today = new Date();
+      const threeMonthsLater = new Date(today);
+      threeMonthsLater.setMonth(threeMonthsLater.getMonth() + 3);
+
       const { data } = await apiClient.get('/fixtures', {
         params: {
           team: AHLY_TEAM_ID,
-          next: 10,
+          season: getSeasonForApi(),
+          from: formatDate(today),
+          to: formatDate(threeMonthsLater),
+          status: 'NS-TBD',
         },
       });
-      return mapApiFixtures(data.response || []);
+
+      const results = data.response || [];
+      if (results.length > 0) {
+        const mapped = mapApiFixtures(results);
+        return mapped.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()).slice(0, 10);
+      }
+      return upcomingMatches;
     } catch {
       return upcomingMatches;
     }
@@ -83,11 +118,18 @@ export async function getStandings(): Promise<Standing[]> {
       const { data } = await apiClient.get('/standings', {
         params: {
           league: EGYPTIAN_LEAGUE_ID,
-          season: CURRENT_SEASON,
+          season: getSeasonForApi(),
         },
       });
-      const leagueStandings = data.response?.[0]?.league?.standings?.[0] || [];
-      return mapApiStandings(leagueStandings);
+
+      const allStandings = data.response?.[0]?.league?.standings || [];
+      // The API may return multiple groups (regular season + playoffs)
+      // Use the last group which is typically the most current
+      const leagueStandings = allStandings[allStandings.length - 1] || [];
+      if (leagueStandings.length > 0) {
+        return mapApiStandings(leagueStandings);
+      }
+      return standings;
     } catch {
       return standings;
     }
@@ -114,7 +156,7 @@ export async function getLiveMatch(): Promise<Match | null> {
     } catch {
       return null;
     }
-  });
+  }, LIVE_CACHE_DURATION);
 }
 
 export async function getNews(): Promise<NewsItem[]> {
@@ -196,6 +238,16 @@ function mapApiFixtures(fixtures: Record<string, unknown>[]): Match[] {
     else if (statusShort === 'HT') status = 'halftime';
     else if (['PST', 'CANC'].includes(statusShort)) status = 'postponed';
 
+    const leagueName = league.name as string;
+    let compType: 'league' | 'cup' | 'continental' | 'international' = 'league';
+    if (leagueName.includes('Champions') || leagueName.includes('CAF') || leagueName.includes('Super Cup')) {
+      compType = 'continental';
+    } else if (leagueName.includes('Cup') || leagueName.includes('كأس')) {
+      compType = 'cup';
+    } else if (leagueName.includes('FIFA') || leagueName.includes('World') || leagueName.includes('Intercontinental')) {
+      compType = 'international';
+    }
+
     return {
       id: fixture.id as number,
       homeTeam: {
@@ -217,9 +269,9 @@ function mapApiFixtures(fixtures: Record<string, unknown>[]): Match[] {
       status,
       competition: {
         id: league.id as number,
-        name: league.name as string,
+        name: leagueName,
         logo: league.logo as string,
-        type: 'league',
+        type: compType,
       },
       venue: (fixture.venue as Record<string, unknown>)?.name as string || '',
       minute: (fixture.status as Record<string, unknown>)?.elapsed as number | undefined,
