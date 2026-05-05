@@ -7,8 +7,9 @@ import {
   Tv,
   Users,
   Settings,
-  Radio,
 } from 'lucide-react';
+
+const basePath = import.meta.env.BASE_URL;
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
@@ -40,14 +41,16 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           ${isOpen ? 'translate-x-0' : '-translate-x-full'} lg:translate-x-0`}
       >
         <div className="flex flex-col h-full">
-          <div className="p-5 border-b border-ahly-border">
+          <div className="p-4 border-b border-ahly-border">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 ahly-gradient rounded-lg flex items-center justify-center">
-                <Radio className="w-5 h-5 text-white" />
-              </div>
+              <img
+                src={`${basePath}ahly-logo.svg`}
+                alt="Al Ahly SC"
+                className="w-12 h-12"
+              />
               <div>
-                <h1 className="text-lg font-bold text-white">Al-Ahly</h1>
-                <p className="text-xs text-ahly-muted">Tracker</p>
+                <h1 className="text-lg font-bold text-white">Al Ahly</h1>
+                <p className="text-[10px] text-ahly-gold font-medium tracking-wider uppercase">النادي الأهلي</p>
               </div>
             </div>
           </div>
@@ -78,10 +81,14 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
             </NavLink>
           </div>
 
-          <div className="p-4 mx-3 mb-3 ahly-gradient-subtle rounded-lg border border-ahly-red/20">
-            <p className="text-xs text-ahly-muted mb-1">Club of the Century</p>
-            <p className="text-sm font-semibold text-white">النادي الأهلي</p>
-            <p className="text-xs text-ahly-gold mt-1">Est. 1907</p>
+          <div className="p-4 mx-3 mb-3 ahly-gradient-subtle rounded-lg border border-ahly-red/20 text-center">
+            <img
+              src={`${basePath}ahly-logo.svg`}
+              alt="Al Ahly SC"
+              className="w-16 h-16 mx-auto mb-2 opacity-80"
+            />
+            <p className="text-xs text-ahly-muted">Club of the Century</p>
+            <p className="text-xs text-ahly-gold mt-0.5">Est. 1907</p>
           </div>
         </div>
       </aside>

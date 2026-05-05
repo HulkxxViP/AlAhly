@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#C8102E"/>
+      <stop offset="100%" style="stop-color:#8B0000"/>
+    </linearGradient>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="50%" style="stop-color:#D4AF37"/>
+      <stop offset="100%" style="stop-color:#B8860B"/>
+    </linearGradient>
+  </defs>
+  <!-- Shield background -->
+  <path d="M100 10 L175 40 L175 110 Q175 160 100 190 Q25 160 25 110 L25 40 Z" fill="url(#shieldGrad)" stroke="url(#goldGrad)" stroke-width="3"/>
+  <!-- Inner shield border -->
+  <path d="M100 20 L165 46 L165 108 Q165 152 100 180 Q35 152 35 108 L35 46 Z" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.6"/>
+  <!-- Eagle body -->
+  <g fill="white" opacity="0.95">
+    <!-- Eagle head -->
+    <ellipse cx="100" cy="58" rx="12" ry="10"/>
+    <!-- Beak -->
+    <path d="M112 58 L122 62 L112 63 Z"/>
+    <!-- Eye -->
+    <circle cx="106" cy="56" r="2" fill="#C8102E"/>
+    <!-- Eagle body -->
+    <ellipse cx="100" cy="82" rx="18" ry="20"/>
+    <!-- Left wing spread -->
+    <path d="M82 72 Q60 50 42 55 Q50 65 58 70 Q48 68 38 72 Q50 78 62 78 Q52 80 45 86 Q58 86 70 82 L82 82 Z"/>
+    <!-- Right wing spread -->
+    <path d="M118 72 Q140 50 158 55 Q150 65 142 70 Q152 68 162 72 Q150 78 138 78 Q148 80 155 86 Q142 86 130 82 L118 82 Z"/>
+    <!-- Tail feathers -->
+    <path d="M90 100 L85 125 L92 118 L97 128 L100 120 L103 128 L108 118 L115 125 L110 100 Z"/>
+    <!-- Talons left -->
+    <path d="M88 100 L82 112 L86 110 L83 116 L88 112" stroke="white" stroke-width="1.5" fill="none"/>
+    <!-- Talons right -->
+    <path d="M112 100 L118 112 L114 110 L117 116 L112 112" stroke="white" stroke-width="1.5" fill="none"/>
+  </g>
+  <!-- Star above eagle -->
+  <path d="M100 30 L103 38 L111 38 L105 43 L107 51 L100 47 L93 51 L95 43 L89 38 L97 38 Z" fill="url(#goldGrad)"/>
+  <!-- Club name banner -->
+  <path d="M55 140 Q100 132 145 140 L145 158 Q100 166 55 158 Z" fill="url(#goldGrad)" opacity="0.9"/>
+  <text x="100" y="153" text-anchor="middle" fill="#8B0000" font-size="13" font-weight="bold" font-family="Arial">AL AHLY</text>
+  <!-- Year -->
+  <text x="100" y="172" text-anchor="middle" fill="url(#goldGrad)" font-size="10" font-weight="bold" font-family="Arial">1907</text>
+</svg>

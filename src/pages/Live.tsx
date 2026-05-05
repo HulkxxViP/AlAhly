@@ -60,7 +60,13 @@ export default function Live() {
     if (document.fullscreenElement) document.exitFullscreen();
   }
 
-  const hasEmbedUrl = (stream: StreamSource) => !!stream.embedUrl;
+  function handleStreamSelect(stream: StreamSource) {
+    if (stream.embedUrl) {
+      setSelectedStream(stream);
+    } else {
+      setSelectedStream(stream);
+    }
+  }
 
   const officialStreams = streamSources.filter((s) => s.type === 'official');
   const freeStreams = streamSources.filter((s) => s.type === 'free');
@@ -112,7 +118,6 @@ export default function Live() {
         </div>
       )}
 
-      {/* Embedded Player */}
       {selectedStream && (
         <div
           ref={playerRef}
@@ -120,72 +125,46 @@ export default function Live() {
             isFullscreen ? 'fixed inset-0 z-[100] rounded-none border-none' : ''
           }`}
         >
-          {/* Player Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-ahly-dark/90 border-b border-ahly-border">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5">
                 <span className="live-dot" />
                 <Play className="w-4 h-4 text-ahly-red" />
               </div>
-              <span className="text-sm font-semibold text-white">
-                {selectedStream.name}
-              </span>
-              <span className="badge bg-green-500/20 text-green-400 text-[10px]">
-                {selectedStream.quality}
-              </span>
+              <span className="text-sm font-semibold text-white">{selectedStream.name}</span>
+              <span className="badge bg-green-500/20 text-green-400 text-[10px]">{selectedStream.quality}</span>
             </div>
             <div className="flex items-center gap-1">
-              {hasEmbedUrl(selectedStream) && (
-                <button
-                  onClick={toggleFullscreen}
-                  className="p-1.5 rounded-md hover:bg-ahly-card text-ahly-muted hover:text-white transition-colors"
-                  title={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
-                >
-                  {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                </button>
-              )}
+              <button
+                onClick={toggleFullscreen}
+                className="p-1.5 rounded-md hover:bg-ahly-card text-ahly-muted hover:text-white transition-colors"
+              >
+                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
               <button
                 onClick={closePlayer}
                 className="p-1.5 rounded-md hover:bg-red-500/20 text-ahly-muted hover:text-red-400 transition-colors"
-                title="Close player"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
           </div>
 
-          {/* Player Content */}
           <div className={`relative bg-black ${isFullscreen ? 'h-[calc(100vh-48px)]' : 'aspect-video'}`}>
-            {hasEmbedUrl(selectedStream) ? (
-              <iframe
-                key={selectedStream.embedUrl}
-                src={selectedStream.embedUrl}
-                className="w-full h-full border-0"
-                allow="autoplay; fullscreen; encrypted-media; picture-in-picture; accelerometer; gyroscope"
-                allowFullScreen
-                referrerPolicy="no-referrer"
-                title={`Stream - ${selectedStream.name}`}
-              />
-            ) : (
-              <iframe
-                key={selectedStream.url}
-                src={selectedStream.url}
-                className="w-full h-full border-0"
-                sandbox="allow-scripts allow-same-origin allow-popups allow-forms allow-presentation allow-popups-to-escape-sandbox"
-                allow="autoplay; fullscreen; encrypted-media"
-                allowFullScreen
-                referrerPolicy="no-referrer"
-                title={`Stream - ${selectedStream.name}`}
-              />
-            )}
+            <iframe
+              key={selectedStream.embedUrl || selectedStream.url}
+              src={selectedStream.embedUrl || selectedStream.url}
+              className="w-full h-full border-0"
+              allow="autoplay; fullscreen; encrypted-media; picture-in-picture; accelerometer; gyroscope"
+              allowFullScreen
+              referrerPolicy="no-referrer"
+              title={`Stream - ${selectedStream.name}`}
+            />
           </div>
 
-          {/* Player Footer */}
           <div className="px-4 py-2 bg-ahly-dark/90 border-t border-ahly-border flex items-center justify-between">
             <span className="text-xs text-ahly-muted">
-              {hasEmbedUrl(selectedStream)
-                ? 'YouTube embed - best compatibility'
-                : 'Embedded stream - if blocked, use "Open in new tab"'}
+              {selectedStream.embedUrl ? 'YouTube Embed' : 'Embedded Stream'} - {selectedStream.language}
             </span>
             <a
               href={selectedStream.url}
@@ -200,14 +179,13 @@ export default function Live() {
         </div>
       )}
 
-      {/* Stream Sources Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <StreamSection
           title="Official Channels"
           icon={<Star className="w-4 h-4 text-ahly-gold" />}
           streams={officialStreams}
           selected={selectedStream}
-          onSelect={setSelectedStream}
+          onSelect={handleStreamSelect}
           badge="Official"
           badgeClass="bg-ahly-gold/20 text-ahly-gold"
         />
@@ -216,7 +194,7 @@ export default function Live() {
           icon={<Zap className="w-4 h-4 text-green-400" />}
           streams={freeStreams}
           selected={selectedStream}
-          onSelect={setSelectedStream}
+          onSelect={handleStreamSelect}
           badge="Free"
           badgeClass="bg-green-500/20 text-green-400"
         />
@@ -225,13 +203,12 @@ export default function Live() {
           icon={<Wifi className="w-4 h-4 text-purple-400" />}
           streams={premiumStreams}
           selected={selectedStream}
-          onSelect={setSelectedStream}
+          onSelect={handleStreamSelect}
           badge="Premium"
           badgeClass="bg-purple-500/20 text-purple-400"
         />
       </div>
 
-      {/* How to Watch */}
       <div className="mt-8 glass-card p-5">
         <div className="flex items-center gap-2 mb-3">
           <Radio className="w-4 h-4 text-ahly-red" />
@@ -288,7 +265,6 @@ function StreamSection({
       <div className="space-y-2">
         {streams.map((stream, i) => {
           const isActive = selected?.name === stream.name;
-          const isEmbeddable = !!stream.embedUrl;
           return (
             <button
               key={i}
@@ -300,11 +276,7 @@ function StreamSection({
               }`}
             >
               <div className="flex items-center gap-3">
-                <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center ${
-                    isActive ? 'bg-ahly-red/20' : 'bg-ahly-card'
-                  }`}
-                >
+                <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${isActive ? 'bg-ahly-red/20' : 'bg-ahly-card'}`}>
                   {isActive ? (
                     <Play className="w-4 h-4 text-ahly-red" />
                   ) : (
@@ -317,7 +289,6 @@ function StreamSection({
                   </p>
                   <p className="text-xs text-ahly-muted">
                     {stream.quality} - {stream.language}
-                    {isEmbeddable && ' - Embeddable'}
                   </p>
                 </div>
               </div>
