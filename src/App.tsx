@@ -10,6 +10,7 @@ import Live from './pages/Live';
 import LiveTv from './pages/LiveTv';
 import Squad from './pages/Squad';
 import Settings from './pages/Settings';
+import Media from './pages/Media';
 import HistoryPage from './pages/History';
 import MusicPlayer from './components/MusicPlayer';
 import AppFooter from './components/AppFooter';
@@ -37,6 +38,7 @@ export default function App() {
                 <Route path="/live" element={<Live />} />
                 <Route path="/live-tv" element={<LiveTv />} />
                 <Route path="/squad" element={<Squad />} />
+                <Route path="/media" element={<Media />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>
             </div>

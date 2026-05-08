@@ -217,8 +217,8 @@ export default function Dashboard() {
       </div>
 
       <div>
-        <SectionHeader title="Latest Match Photos" icon={<Camera />} link="/matches" />
-        <MatchGallery limit={2} />
+        <SectionHeader title="Latest Match Photos" icon={<Camera />} link="/media" />
+        <MatchGallery limit={10} />
       </div>
     </div>
   );
@@ -305,6 +305,20 @@ function SectionHeader({
 }
 
 function NextMatchHero({ match: nextMatch }: { match: Match }) {
+  const tickerItems = [
+    { text: nextMatch.competition.name, icon: '🏆' },
+    { text: nextMatch.venue || 'Venue TBD', icon: '📍' },
+    { text: `${nextMatch.date} at ${nextMatch.time}`, icon: '📅' },
+  ];
+  const [tickerIndex, setTickerIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setTickerIndex((prev) => (prev + 1) % 3);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="ahly-gradient rounded-2xl p-6 md:p-8 relative overflow-hidden h-full">
       <div className="absolute inset-0 overflow-hidden">
@@ -317,18 +331,27 @@ function NextMatchHero({ match: nextMatch }: { match: Match }) {
         <div className="absolute top-1/2 left-1/3 w-32 h-32 opacity-[0.03] animate-float" style={{ animationDelay: '1s' }}>
           <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
         </div>
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-ahly-gold/50 to-transparent animate-shimmer" />
       </div>
 
       <div className="relative z-10 h-full flex flex-col justify-center">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1.5">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+              <span className="relative flex h-2.5 w-2.5">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ahly-gold opacity-60" />
+                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-ahly-gold" />
               </span>
-              <span className="text-sm text-white/80 font-medium tracking-wide uppercase">Next Match</span>
+              <span className="text-sm text-ahly-gold font-bold tracking-wide uppercase" style={{textShadow: '0 0 10px rgba(212,175,55,0.3)'}}>
+                Next Match
+              </span>
             </div>
+          </div>
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-white/60 border-l border-white/10 pl-3 ml-2">
+            <span className="animate-slide-right flex items-center gap-1" key={tickerIndex}>
+              <span>{tickerItems[tickerIndex].icon}</span>
+              <span className="truncate max-w-[140px]">{tickerItems[tickerIndex].text}</span>
+            </span>
           </div>
         </div>
 
