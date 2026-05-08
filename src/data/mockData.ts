@@ -406,6 +406,28 @@ export const squad: Player[] = [
   { id: 20, name: 'Taher Mohamed', nameAr: 'طاهر محمد', position: 'Forward', number: 19, nationality: 'Egypt', age: 28, goals: 6, assists: 5, appearances: 27 },
 ];
 
+export const liveMatch: Match = {
+  id: 1001,
+  homeTeam: AHLY_TEAM,
+  awayTeam: teams.zamalek,
+  homeScore: 1,
+  awayScore: 0,
+  date: '2026-05-09',
+  time: '21:00',
+  status: 'live',
+  minute: 67,
+  competition: competitions[0],
+  venue: 'Cairo International Stadium',
+  events: [
+    { minute: 23, type: 'goal', player: 'Trezeguet', team: 'home' },
+    { minute: 35, type: 'yellow', player: 'Rami Rabia', team: 'home' },
+    { minute: 44, type: 'yellow', player: 'Nasser Maher', team: 'away' },
+    { minute: 52, type: 'substitution', player: 'Percy Tau → Hussein El Shahat', team: 'home' },
+    { minute: 58, type: 'goal', player: 'Zizou', team: 'away' },
+    { minute: 62, type: 'substitution', player: 'Ahmed Sayed → Zizou', team: 'away' },
+  ],
+};
+
 export const streamSources: StreamSource[] = [
   { name: 'Al Ahly TV - YouTube', url: 'https://www.youtube.com/@AlAHLYTVCHANNEL/streams', quality: 'HD', language: 'Arabic', type: 'official' },
   { name: 'Al Ahly Matches - YouTube', url: 'https://www.youtube.com/@AlAHLYTVCHANNEL', quality: 'HD', language: 'Arabic', type: 'official' },
