@@ -150,17 +150,17 @@ export default function Dashboard() {
         <DashboardLiveBar match={liveMatch} eventIndex={dashboardEventIndex} />
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {nextMatch && (
-          <div className={`${liveMatch && liveMatch.status === 'live' ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
-            <NextMatchHero match={nextMatch} />
-          </div>
+          <NextMatchHero match={nextMatch} />
         )}
 
-        {liveMatch && liveMatch.status === 'live' && (
-          <div className="lg:col-span-1">
-            <LiveMatchCard match={liveMatch} />
-          </div>
+        {liveMatch && liveMatch.status === 'live' ? (
+          <LiveMatchCard match={liveMatch} />
+        ) : nextMatch ? (
+          <LiveWaitingCard match={nextMatch} />
+        ) : (
+          <LiveWaitingCard />
         )}
       </div>
 
@@ -528,6 +528,96 @@ function LiveMatchCard({ match }: { match: Match }) {
         </div>
       </div>
     </Link>
+  );
+}
+
+function LiveWaitingCard({ match }: { match?: Match }) {
+  const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 });
+
+  useEffect(() => {
+    if (!match) return;
+    const target = new Date(`${match.date}T${match.time}:00`);
+    const update = () => {
+      const diff = target.getTime() - Date.now();
+      if (diff <= 0) { setTimeLeft({ d: 0, h: 0, m: 0, s: 0 }); return; }
+      setTimeLeft({
+        d: Math.floor(diff / 86400000),
+        h: Math.floor((diff % 86400000) / 3600000),
+        m: Math.floor((diff % 3600000) / 60000),
+        s: Math.floor((diff % 60000) / 1000),
+      });
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [match?.date, match?.time]);
+
+  return (
+    <div className="bg-gradient-to-br from-ahly-card/50 to-ahly-dark border border-ahly-border/50 rounded-2xl p-5 md:p-6 relative overflow-hidden h-full flex flex-col">
+      <div className="absolute top-0 right-0 w-40 h-40 opacity-[0.04]">
+        <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
+      </div>
+
+      <div className="relative z-10 flex flex-col items-center justify-center h-full gap-4">
+        {match ? (
+          <>
+            <div className="flex items-center gap-2">
+              <Clock className="w-4 h-4 text-ahly-gold" />
+              <span className="text-xs text-ahly-gold font-bold tracking-wide uppercase">Next Match</span>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-full bg-ahly-dark/70 border border-ahly-red/30 flex items-center justify-center p-1">
+                <LogoImage src={match.homeTeam.logo} name={match.homeTeam.name} isAhly={true} className="w-full h-full" />
+              </div>
+              <span className="text-xs text-ahly-muted font-medium">vs</span>
+              <div className={`w-10 h-10 rounded-full bg-ahly-dark/70 border flex items-center justify-center p-1 ${match.awayTeam.isAhly ? 'border-ahly-red/30' : 'border-ahly-gold/20'}`}>
+                <LogoImage src={match.awayTeam.logo} name={match.awayTeam.name} isAhly={match.awayTeam.isAhly} className="w-full h-full" />
+              </div>
+            </div>
+
+            <p className="text-sm text-white/80 font-semibold text-center">{match.homeTeam.name} vs {match.awayTeam.name}</p>
+
+            <div className="flex items-center gap-1 tabular-nums text-lg">
+              {timeLeft.d > 0 && (
+                <span className="bg-ahly-card border border-ahly-border rounded px-2 py-1">
+                  <span className="text-white font-bold">{timeLeft.d}</span>
+                  <span className="text-ahly-muted text-[10px] ml-0.5">d</span>
+                </span>
+              )}
+              <span className="bg-ahly-card border border-ahly-border rounded px-2 py-1">
+                <span className="text-white font-bold">{String(timeLeft.h).padStart(2, '0')}</span>
+                <span className="text-ahly-muted text-[10px] ml-0.5">h</span>
+              </span>
+              <span className="text-white font-bold text-lg">:</span>
+              <span className="bg-ahly-card border border-ahly-border rounded px-2 py-1">
+                <span className="text-white font-bold">{String(timeLeft.m).padStart(2, '0')}</span>
+                <span className="text-ahly-muted text-[10px] ml-0.5">m</span>
+              </span>
+              <span className="text-white font-bold text-lg">:</span>
+              <span className="bg-ahly-card border border-ahly-border rounded px-2 py-1">
+                <span className="text-white font-bold">{String(timeLeft.s).padStart(2, '0')}</span>
+                <span className="text-ahly-muted text-[10px] ml-0.5">s</span>
+              </span>
+            </div>
+
+            <p className="text-[10px] text-ahly-muted/50 text-center">
+              Match starts soon &mdash; live events will appear here automatically
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="w-14 h-14 rounded-full bg-ahly-card border border-ahly-border flex items-center justify-center">
+              <Clock className="w-6 h-6 text-ahly-muted/50" />
+            </div>
+            <div className="text-center">
+              <p className="text-sm text-ahly-muted font-medium">No Live Matches</p>
+              <p className="text-[10px] text-ahly-muted/50 mt-1">Waiting for the next match to begin</p>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
   );
 }
 
