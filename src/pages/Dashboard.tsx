@@ -135,91 +135,19 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {liveMatch ? (
-        <LiveMatchTracker match={liveMatch} />
-      ) : nextMatch && (
-        <div className="ahly-gradient rounded-2xl p-6 md:p-8 relative overflow-hidden">
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-20 -right-20 w-80 h-80 opacity-[0.06] animate-float-slow">
-              <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
-            </div>
-            <div className="absolute -bottom-10 -left-10 w-48 h-48 opacity-[0.04] animate-float" style={{ animationDelay: '2s' }}>
-              <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
-            </div>
-            <div className="absolute top-1/2 left-1/3 w-32 h-32 opacity-[0.03] animate-float" style={{ animationDelay: '1s' }}>
-              <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
-            </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {nextMatch && (
+          <div className={`${liveMatch && liveMatch.status === 'live' ? 'lg:col-span-2' : 'lg:col-span-3'}`}>
+            <NextMatchHero match={nextMatch} />
           </div>
+        )}
 
-          <div className="relative z-10">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1.5">
-                  <span className="relative flex h-2 w-2">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
-                    <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
-                  </span>
-                  <span className="text-sm text-white/80 font-medium tracking-wide uppercase">Next Match</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-center gap-6 md:gap-12 mb-6">
-              <div className="flex flex-col items-center gap-3 min-w-0">
-                <div className="relative w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full bg-ahly-dark/50 border-2 border-ahly-red/40 flex items-center justify-center p-1.5 animate-float shadow-lg shadow-ahly-red/30 flex-shrink-0">
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-ahly-red/10 to-transparent animate-pulse-red" />
-                  <LogoImage
-                    src={nextMatch.homeTeam.logo}
-                    name={nextMatch.homeTeam.name}
-                    isAhly={true}
-                    className="w-full h-full"
-                  />
-                </div>
-                <span className="text-xs md:text-sm font-semibold text-white/90 text-center max-w-28 leading-tight">
-                  {nextMatch.homeTeam.name}
-                </span>
-              </div>
-
-              <div className="flex flex-col items-center gap-1">
-                <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-ahly-red/30 to-ahly-gold/20 border border-ahly-red/30 flex items-center justify-center animate-glow">
-                  <span className="text-base md:text-lg font-black text-white">VS</span>
-                </div>
-                <span className="text-[10px] text-white/40 uppercase tracking-widest font-medium">Matchup</span>
-              </div>
-
-              <div className="flex flex-col items-center gap-3 min-w-0">
-                <div className={`relative w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full bg-ahly-dark/50 border-2 flex items-center justify-center p-1.5 animate-float shadow-lg flex-shrink-0 ${nextMatch.awayTeam.isAhly ? 'border-ahly-red/40 shadow-ahly-red/30' : 'border-ahly-gold/30 shadow-ahly-gold/20'}`} style={{ animationDelay: '1.5s' }}>
-                  <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${nextMatch.awayTeam.isAhly ? 'from-ahly-red/10 to-transparent' : 'from-ahly-gold/10 to-transparent'} animate-pulse-red`} />
-                  <LogoImage
-                    src={nextMatch.awayTeam.logo}
-                    name={nextMatch.awayTeam.name}
-                    isAhly={nextMatch.awayTeam.isAhly}
-                    className="w-full h-full"
-                  />
-                </div>
-                <span className="text-xs md:text-sm font-semibold text-white/90 text-center max-w-28 leading-tight truncate w-full">
-                  {nextMatch.awayTeam.name}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
-              <CountdownTimer targetDate={nextMatch.date} targetTime={nextMatch.time} />
-            </div>
-            <div className="flex items-center gap-3 text-sm text-white/70">
-              <span className={`competition-badge ${nextMatch.competition.type}`}>
-                {nextMatch.competition.name}
-              </span>
-              {nextMatch.venue && (
-                <span className="flex items-center gap-1">
-                  <Zap className="w-3 h-3" />
-                  {nextMatch.venue}
-                </span>
-              )}
-            </div>
+        {liveMatch && liveMatch.status === 'live' && (
+          <div className="lg:col-span-1">
+            <LiveMatchCard match={liveMatch} />
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {stats && ahlyStanding && (
         <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-fade">
@@ -371,35 +299,9 @@ function SectionHeader({
   );
 }
 
-function LiveMatchTracker({ match }: { match: Match }) {
-  const [simMinute, setSimMinute] = useState(match.minute || 0);
-  const [autoRefresh, setAutoRefresh] = useState(true);
-
-  useEffect(() => {
-    setSimMinute(match.minute || 0);
-  }, [match.minute, match.id]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSimMinute((prev) => {
-        if (prev >= 90) return prev;
-        if (prev < 45) return prev + 1;
-        if (prev === 45) return prev + 15;
-        return prev + 1;
-      });
-    }, 60000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const isAhlyHome = match.homeTeam.isAhly;
-  const isAhlyAway = match.awayTeam.isAhly;
-  const ahlyScore = isAhlyHome ? match.homeScore : match.awayScore;
-  const oppScore = isAhlyHome ? match.awayScore : match.homeScore;
-  const ahlyWinning = ahlyScore !== null && oppScore !== null && ahlyScore > oppScore;
-  const isDraw = ahlyScore !== null && oppScore !== null && ahlyScore === oppScore;
-
+function NextMatchHero({ match: nextMatch }: { match: Match }) {
   return (
-    <div className="ahly-gradient rounded-2xl p-6 md:p-8 relative overflow-hidden">
+    <div className="ahly-gradient rounded-2xl p-6 md:p-8 relative overflow-hidden h-full">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 -right-20 w-80 h-80 opacity-[0.06] animate-float-slow">
           <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
@@ -412,154 +314,154 @@ function LiveMatchTracker({ match }: { match: Match }) {
         </div>
       </div>
 
-      <div className="relative z-10">
+      <div className="relative z-10 h-full flex flex-col justify-center">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-red-500/20 px-3 py-1 rounded-full border border-red-400/30">
-              <span className="relative flex h-2.5 w-2.5">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500" />
-              </span>
-              <span className="text-sm font-bold text-red-300 tracking-wide">LIVE</span>
-              <span className="text-sm font-bold text-white tabular-nums bg-red-500/30 px-1.5 py-0.5 rounded">
-                {simMinute}&apos;
-              </span>
-            </div>
-            <span className="hidden sm:flex items-center gap-1 text-xs text-white/60">
-              <RefreshCw className={`w-3 h-3 ${autoRefresh ? 'animate-spin' : ''}`} />
-              Auto
-            </span>
-          </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() => setAutoRefresh(!autoRefresh)}
-              className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
-                autoRefresh
-                  ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                  : 'bg-ahly-dark/50 text-white/60 border border-white/10'
-              }`}
-            >
-              <RotateCcw className="w-3 h-3" />
-              {autoRefresh ? 'On' : 'Off'}
-            </button>
-            <Link
-              to="/live"
-              className="flex items-center gap-1 px-3 py-1 rounded-lg bg-white/10 hover:bg-white/20 text-xs font-medium text-white transition-all border border-white/10"
-            >
-              <Activity className="w-3 h-3" />
-              Watch
-            </Link>
+            <div className="flex items-center gap-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+              </span>
+              <span className="text-sm text-white/80 font-medium tracking-wide uppercase">Next Match</span>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center justify-center gap-4 md:gap-10 mb-6">
+        <div className="flex items-center justify-center gap-6 md:gap-12 mb-6">
           <div className="flex flex-col items-center gap-3 min-w-0">
             <div className="relative w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full bg-ahly-dark/50 border-2 border-ahly-red/40 flex items-center justify-center p-1.5 animate-float shadow-lg shadow-ahly-red/30 flex-shrink-0">
               <div className="absolute inset-0 rounded-full bg-gradient-to-br from-ahly-red/10 to-transparent animate-pulse-red" />
               <LogoImage
-                src={match.homeTeam.logo}
-                name={match.homeTeam.name}
+                src={nextMatch.homeTeam.logo}
+                name={nextMatch.homeTeam.name}
                 isAhly={true}
                 className="w-full h-full"
               />
             </div>
-            <span className="text-xs md:text-sm font-semibold text-white/90 text-center max-w-28 leading-tight truncate w-full">
-              {match.homeTeam.name}
+            <span className="text-xs md:text-sm font-semibold text-white/90 text-center max-w-28 leading-tight">
+              {nextMatch.homeTeam.name}
             </span>
           </div>
 
-          <div className="flex flex-col items-center">
-            <div className="flex items-center gap-3 md:gap-4">
-              <span className={`text-5xl md:text-7xl font-black tabular-nums ${
-                isAhlyHome && ahlyWinning ? 'text-green-400 drop-shadow-[0_0_20px_rgba(74,222,128,0.5)]' : isAhlyHome ? 'text-white' : 'text-ahly-muted/60'
-              }`}>
-                {match.homeScore}
-              </span>
-              <span className="text-2xl md:text-3xl font-bold text-white/40">:</span>
-              <span className={`text-5xl md:text-7xl font-black tabular-nums ${
-                isAhlyAway && ahlyWinning ? 'text-green-400 drop-shadow-[0_0_20px_rgba(74,222,128,0.5)]' : isAhlyAway ? 'text-white' : 'text-ahly-muted/60'
-              }`}>
-                {match.awayScore}
-              </span>
+          <div className="flex flex-col items-center gap-1">
+            <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-ahly-red/30 to-ahly-gold/20 border border-ahly-red/30 flex items-center justify-center animate-glow">
+              <span className="text-base md:text-lg font-black text-white">VS</span>
             </div>
-            <span className={`text-xs font-bold mt-1 ${ahlyWinning ? 'text-green-400' : isDraw ? 'text-yellow-400' : match.status === 'halftime' ? 'text-ahly-gold' : 'text-red-300'}`}>
-              {ahlyWinning ? 'AL AHLY LEADING' : isDraw && simMinute >= 45 ? 'DRAW' : match.status === 'halftime' ? 'HALF TIME' : 'IN PROGRESS'}
-            </span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-medium">Matchup</span>
           </div>
 
           <div className="flex flex-col items-center gap-3 min-w-0">
-            <div className={`relative w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full bg-ahly-dark/50 border-2 flex items-center justify-center p-1.5 animate-float shadow-lg flex-shrink-0 ${match.awayTeam.isAhly ? 'border-ahly-red/40 shadow-ahly-red/30' : 'border-ahly-gold/30 shadow-ahly-gold/20'}`} style={{ animationDelay: '1.5s' }}>
-              <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${match.awayTeam.isAhly ? 'from-ahly-red/10 to-transparent' : 'from-ahly-gold/10 to-transparent'} animate-pulse-red`} />
+            <div className={`relative w-24 h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full bg-ahly-dark/50 border-2 flex items-center justify-center p-1.5 animate-float shadow-lg flex-shrink-0 ${nextMatch.awayTeam.isAhly ? 'border-ahly-red/40 shadow-ahly-red/30' : 'border-ahly-gold/30 shadow-ahly-gold/20'}`} style={{ animationDelay: '1.5s' }}>
+              <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${nextMatch.awayTeam.isAhly ? 'from-ahly-red/10 to-transparent' : 'from-ahly-gold/10 to-transparent'} animate-pulse-red`} />
               <LogoImage
-                src={match.awayTeam.logo}
-                name={match.awayTeam.name}
-                isAhly={match.awayTeam.isAhly}
+                src={nextMatch.awayTeam.logo}
+                name={nextMatch.awayTeam.name}
+                isAhly={nextMatch.awayTeam.isAhly}
                 className="w-full h-full"
               />
             </div>
             <span className="text-xs md:text-sm font-semibold text-white/90 text-center max-w-28 leading-tight truncate w-full">
-              {match.awayTeam.name}
+              {nextMatch.awayTeam.name}
             </span>
           </div>
         </div>
 
-        <div className="flex items-center gap-3 text-sm text-white/70 mb-5">
-          <span className={`competition-badge ${match.competition.type}`}>
-            {match.competition.name}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
+          <CountdownTimer targetDate={nextMatch.date} targetTime={nextMatch.time} />
+        </div>
+        <div className="flex items-center gap-3 text-sm text-white/70">
+          <span className={`competition-badge ${nextMatch.competition.type}`}>
+            {nextMatch.competition.name}
           </span>
-          {match.venue && (
+          {nextMatch.venue && (
             <span className="flex items-center gap-1">
               <Zap className="w-3 h-3" />
-              {match.venue}
+              {nextMatch.venue}
             </span>
           )}
         </div>
-
-        {match.events && match.events.length > 0 && (
-          <div className="bg-ahly-dark/40 backdrop-blur-sm border border-white/10 rounded-xl p-4 md:p-5">
-            <div className="flex items-center gap-2 mb-3">
-              <Goal className="w-4 h-4 text-ahly-gold" />
-              <h3 className="text-sm font-bold text-white">Match Events</h3>
-            </div>
-            <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1 scrollbar-thin">
-              {match.events.map((event, i) => (
-                <div
-                  key={i}
-                  className="flex items-center gap-3 text-sm animate-slide-right"
-                  style={{ animationDelay: `${i * 50}ms` }}
-                >
-                  <span className="text-xs text-ahly-muted w-10 tabular-nums font-medium">
-                    {event.minute}&apos;
-                  </span>
-                  <span className="flex items-center justify-center w-6 h-6 rounded-full bg-ahly-dark/80">
-                    {event.type === 'goal' && <span className="text-sm">⚽</span>}
-                    {event.type === 'yellow' && <span className="text-sm">🟨</span>}
-                    {event.type === 'red' && <span className="text-sm">🟥</span>}
-                    {event.type === 'substitution' && <span className="text-xs">🔄</span>}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <span
-                      className={`font-medium truncate block ${
-                        (event.team === 'home' && isAhlyHome) || (event.team === 'away' && isAhlyAway)
-                          ? 'text-white'
-                          : 'text-ahly-muted'
-                      }`}
-                    >
-                      {event.player}
-                    </span>
-                  </div>
-                  {event.type === 'goal' && (
-                    <span className="text-lg font-bold tabular-nums text-ahly-gold drop-shadow-[0_0_6px_rgba(212,175,55,0.4)]">
-                      {match.homeScore ?? '-'}:{match.awayScore ?? '-'}
-                    </span>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
+  );
+}
+
+function LiveMatchCard({ match }: { match: Match }) {
+  const isAhlyHome = match.homeTeam.isAhly;
+  const isAhlyAway = match.awayTeam.isAhly;
+  const ahlyScore = isAhlyHome ? match.homeScore : match.awayScore;
+  const oppScore = isAhlyHome ? match.awayScore : match.homeScore;
+  const ahlyWinning = ahlyScore !== null && oppScore !== null && ahlyScore > oppScore;
+  const isDraw = ahlyScore !== null && oppScore !== null && ahlyScore === oppScore;
+
+  return (
+    <Link to="/live" className="block h-full">
+      <div className="bg-gradient-to-br from-ahly-red/20 via-ahly-card to-ahly-dark border border-ahly-red/30 rounded-2xl p-5 relative overflow-hidden h-full hover:border-ahly-red/50 transition-all group">
+        <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.05]">
+          <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
+        </div>
+
+        <div className="relative z-10 h-full flex flex-col justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+            </span>
+            <span className="text-xs font-bold text-red-400 tracking-wide">LIVE</span>
+            {match.minute && (
+              <span className="text-xs font-bold text-white tabular-nums bg-red-500/20 px-1.5 py-0.5 rounded ml-1">
+                {match.minute}&apos;
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-center justify-center gap-3">
+            <div className="flex flex-col items-center gap-1.5">
+              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-ahly-dark/60 border-2 border-ahly-red/30 flex items-center justify-center p-1">
+                <LogoImage src={match.homeTeam.logo} name={match.homeTeam.name} isAhly={true} className="w-full h-full" />
+              </div>
+              <span className="text-[10px] text-white/70 text-center leading-tight truncate w-full max-w-16">
+                {match.homeTeam.name}
+              </span>
+            </div>
+
+            <div className="flex flex-col items-center">
+              <div className="flex items-center gap-1">
+                <span className={`text-2xl md:text-3xl font-black tabular-nums ${
+                  isAhlyHome && ahlyWinning ? 'text-green-400' : 'text-white'
+                }`}>
+                  {match.homeScore}
+                </span>
+                <span className="text-lg font-bold text-white/40">:</span>
+                <span className={`text-2xl md:text-3xl font-black tabular-nums ${
+                  isAhlyAway && ahlyWinning ? 'text-green-400' : 'text-white'
+                }`}>
+                  {match.awayScore}
+                </span>
+              </div>
+              <span className={`text-[10px] font-bold mt-0.5 ${ahlyWinning ? 'text-green-400' : isDraw ? 'text-yellow-400' : 'text-red-300'}`}>
+                {ahlyWinning ? 'LEADING' : isDraw ? 'DRAW' : 'TRAILING'}
+              </span>
+            </div>
+
+            <div className="flex flex-col items-center gap-1.5">
+              <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-ahly-dark/60 border-2 flex items-center justify-center p-1 ${match.awayTeam.isAhly ? 'border-ahly-red/30' : 'border-ahly-gold/20'}`}>
+                <LogoImage src={match.awayTeam.logo} name={match.awayTeam.name} isAhly={match.awayTeam.isAhly} className="w-full h-full" />
+              </div>
+              <span className="text-[10px] text-white/70 text-center leading-tight truncate w-full max-w-16">
+                {match.awayTeam.name}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between text-[10px] text-white/50 border-t border-white/10 pt-2">
+            <span>{match.competition.name}</span>
+            <span className="flex items-center gap-1 text-ahly-red group-hover:gap-1.5 transition-all">
+              Watch <ChevronRight className="w-3 h-3" />
+            </span>
+          </div>
+        </div>
+      </div>
+    </Link>
   );
 }
 
