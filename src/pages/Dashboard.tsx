@@ -320,7 +320,7 @@ function NextMatchHero({ match: nextMatch }: { match: Match }) {
   }, []);
 
   return (
-    <div className="ahly-gradient rounded-2xl p-6 md:p-8 relative overflow-hidden h-full">
+    <div className="bg-gradient-to-br from-ahly-red/15 via-ahly-card to-ahly-dark border border-ahly-red/30 rounded-2xl p-6 md:p-8 relative overflow-hidden h-full hover:border-ahly-red/50 transition-all group">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 -right-20 w-80 h-80 opacity-[0.06] animate-float-slow">
           <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
@@ -331,7 +331,7 @@ function NextMatchHero({ match: nextMatch }: { match: Match }) {
         <div className="absolute top-1/2 left-1/3 w-32 h-32 opacity-[0.03] animate-float" style={{ animationDelay: '1s' }}>
           <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
         </div>
-        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-ahly-gold/50 to-transparent animate-shimmer" />
+        <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-ahly-red/50 to-transparent animate-shimmer" />
       </div>
 
       <div className="relative z-10 h-full flex flex-col justify-center">

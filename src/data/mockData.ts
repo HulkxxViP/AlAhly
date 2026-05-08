@@ -805,7 +805,7 @@ export const historicalMatches: Match[] = [
 export const matchGallery: MatchGalleryItem[] = [
   {
     id: 'g1',
-    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000378896-69fa4f27affd4.jpg',
+    imageUrl: 'https://picsum.photos/seed/ahly-g1/800/450',
     caption: 'Al Ahly ease past Enppi 3-0 in Egyptian League to keep title hopes alive',
     matchId: 3,
     matchTitle: 'Al Ahly 3-0 ENPPI',
@@ -813,7 +813,7 @@ export const matchGallery: MatchGalleryItem[] = [
   },
   {
     id: 'g2',
-    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000376037-69f513b1c6d0d.jpg',
+    imageUrl: 'https://picsum.photos/seed/ahly-g2/800/450',
     caption: 'Bencharki leads Al Ahly to 3-0 win over Zamalek in Cairo derby',
     matchId: 2,
     matchTitle: 'Zamalek 0-3 Al Ahly',
@@ -821,7 +821,7 @@ export const matchGallery: MatchGalleryItem[] = [
   },
   {
     id: 'g3',
-    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000373775-69efbe2c1f8f1.jpg',
+    imageUrl: 'https://picsum.photos/seed/ahly-g3/800/450',
     caption: 'Al Ahly beaten by Pyramids FC in Egyptian Premier League',
     matchId: 4,
     matchTitle: 'Pyramids 3-0 Al Ahly',
@@ -829,7 +829,7 @@ export const matchGallery: MatchGalleryItem[] = [
   },
   {
     id: 'g4',
-    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000378320-69f8da93f4232.jpg',
+    imageUrl: 'https://picsum.photos/seed/ahly-g4/800/450',
     caption: 'Al Ahly injury update ahead of Enppi league clash - Trezeguet sidelined',
     matchId: 3,
     matchTitle: 'Al Ahly 3-0 ENPPI',
@@ -837,7 +837,7 @@ export const matchGallery: MatchGalleryItem[] = [
   },
   {
     id: 'g5',
-    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000378897-69fa4f27affd5.jpg',
+    imageUrl: 'https://picsum.photos/seed/ahly-g5/800/450',
     caption: 'Al Ahly squad training at WE Al Salam Stadium ahead of crucial playoff matches',
     matchId: 3,
     matchTitle: 'Al Ahly Training',
@@ -845,7 +845,7 @@ export const matchGallery: MatchGalleryItem[] = [
   },
   {
     id: 'g6',
-    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000378898-69fa4f27affd6.jpg',
+    imageUrl: 'https://picsum.photos/seed/ahly-g6/800/450',
     caption: 'Trezeguet in fine form during Al Ahly victory over Ceramica Cleopatra',
     matchId: 5,
     matchTitle: 'Ceramica 1-1 Al Ahly',
@@ -853,7 +853,7 @@ export const matchGallery: MatchGalleryItem[] = [
   },
   {
     id: 'g7',
-    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000378899-69fa4f27affd7.jpg',
+    imageUrl: 'https://picsum.photos/seed/ahly-g7/800/450',
     caption: 'Al Ahly fans fill Cairo International Stadium for the derby clash',
     matchId: 2,
     matchTitle: 'Zamalek 0-3 Al Ahly',
@@ -861,7 +861,7 @@ export const matchGallery: MatchGalleryItem[] = [
   },
   {
     id: 'g8',
-    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000378900-69fa4f27affd8.jpg',
+    imageUrl: 'https://picsum.photos/seed/ahly-g8/800/450',
     caption: 'Wessam Abou Ali celebrates after scoring for Al Ahly in league action',
     matchId: 4,
     matchTitle: 'Al Ahly 2-1 Smouha',
@@ -869,7 +869,7 @@ export const matchGallery: MatchGalleryItem[] = [
   },
   {
     id: 'g9',
-    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000378901-69fa4f27affd9.jpg',
+    imageUrl: 'https://picsum.photos/seed/ahly-g9/800/450',
     caption: 'Percy Tau in action for Al Ahly against Talaea El Gaish',
     matchId: 6,
     matchTitle: 'Talaea 1-2 Al Ahly',
@@ -877,7 +877,7 @@ export const matchGallery: MatchGalleryItem[] = [
   },
   {
     id: 'g10',
-    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000378902-69fa4f27affd0.jpg',
+    imageUrl: 'https://picsum.photos/seed/ahly-g10/800/450',
     caption: 'Al Ahly team huddle before kickoff against El Gouna at home',
     matchId: 9,
     matchTitle: 'Al Ahly 1-0 El Gouna',

@@ -232,16 +232,14 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
 
-        <div className="flex items-center justify-center flex-1">
-          <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-ahly-red/20 via-ahly-red/30 to-ahly-gold/15 border border-ahly-red/40 shadow-lg shadow-ahly-red/10 group hover:border-ahly-gold/50 hover:shadow-ahly-gold/10 transition-all duration-500">
-            <span className="text-[10px] md:text-xs font-medium text-ahly-muted/80 tracking-wide">Created with</span>
-            <span className="animate-heart-pulse text-red-500 drop-shadow-[0_0_8px_rgba(200,16,46,0.7)]" style={{ fontSize: '0.75rem', lineHeight: 1 }}>❤</span>
-            <span className="text-[10px] md:text-xs font-semibold text-ahly-muted/80 tracking-wide">By</span>
-            <span className="text-xs md:text-sm font-extrabold bg-gradient-to-r from-ahly-gold via-yellow-300 to-ahly-red bg-clip-text text-transparent bg-[length:200%_100%] animate-shimmer-text drop-shadow-[0_0_10px_rgba(212,175,55,0.4)]">Hulk</span>
-          </span>
-        </div>
-
         <div className="flex items-center gap-3">
+          <span className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-ahly-red/20 via-ahly-red/30 to-ahly-gold/15 border border-ahly-red/40 shadow-lg shadow-ahly-red/10 group hover:border-ahly-gold/50 hover:shadow-ahly-gold/10 transition-all duration-500">
+            <span className="text-[10px] font-medium text-ahly-muted/80 tracking-wide">Created with</span>
+            <span className="animate-heart-pulse text-red-500 drop-shadow-[0_0_8px_rgba(200,16,46,0.7)]" style={{ fontSize: '0.75rem', lineHeight: 1 }}>❤</span>
+            <span className="text-[10px] font-semibold text-ahly-muted/80 tracking-wide">By</span>
+            <span className="text-xs font-extrabold bg-gradient-to-r from-ahly-gold via-yellow-300 to-ahly-red bg-clip-text text-transparent bg-[length:200%_100%] animate-shimmer-text drop-shadow-[0_0_10px_rgba(212,175,55,0.4)]">Hulk</span>
+          </span>
+
           <div className="md:hidden relative">
             <button
               onClick={() => { setShowMobileSearch(true); setTimeout(() => mobileInputRef.current?.focus(), 100); }}
