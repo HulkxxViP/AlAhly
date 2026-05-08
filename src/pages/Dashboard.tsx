@@ -71,10 +71,7 @@ export default function Dashboard() {
     <div className="space-y-6 page-enter">
       <LiveScoreTicker />
 
-      <div className="flex items-center justify-between">
-        <div className="text-center text-sm text-ahly-muted">
-          Created with ❤️ By Hulk
-        </div>
+      <div className="flex items-center justify-end">
         <button
           onClick={async () => {
             if (notificationsOn) {
@@ -113,7 +110,7 @@ export default function Dashboard() {
           </div>
 
           <div className="relative z-10">
-            <div className="flex items-center gap-2 mb-1">
+            <div className="flex items-center gap-2 mb-4">
               <div className="flex items-center gap-1.5">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
@@ -122,9 +119,51 @@ export default function Dashboard() {
                 <span className="text-sm text-white/80 font-medium tracking-wide uppercase">Next Match</span>
               </div>
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-3 text-shadow-red">
-              {nextMatch.homeTeam.name} vs {nextMatch.awayTeam.name}
-            </h2>
+
+            <div className="flex items-center justify-center gap-4 md:gap-8 mb-5">
+              <div className="flex flex-col items-center gap-2">
+                <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-ahly-dark/50 border-2 border-ahly-red/40 flex items-center justify-center p-1 animate-float shadow-lg shadow-ahly-red/20">
+                  <div className="absolute inset-0 rounded-full bg-gradient-to-br from-ahly-red/10 to-transparent animate-pulse-red" />
+                  <img
+                    src={nextMatch.homeTeam.logo || `${import.meta.env.BASE_URL}ahly-logo.png`}
+                    alt={nextMatch.homeTeam.name}
+                    className="w-full h-full object-contain relative z-10"
+                    style={{ filter: 'drop-shadow(0 2px 8px rgba(200,16,46,0.3))' }}
+                  />
+                </div>
+                <span className="text-xs font-semibold text-white/90 text-center max-w-24 leading-tight">
+                  {nextMatch.homeTeam.name}
+                </span>
+              </div>
+
+              <div className="flex flex-col items-center gap-1">
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-gradient-to-br from-ahly-red/30 to-ahly-gold/20 border border-ahly-red/30 flex items-center justify-center animate-glow">
+                  <span className="text-sm md:text-base font-black text-white">VS</span>
+                </div>
+                <span className="text-[10px] text-white/40 uppercase tracking-widest font-medium">Matchup</span>
+              </div>
+
+              <div className="flex flex-col items-center gap-2">
+                <div className={`relative w-20 h-20 md:w-24 md:h-24 rounded-full bg-ahly-dark/50 border-2 flex items-center justify-center p-1 animate-float shadow-lg ${nextMatch.awayTeam.isAhly ? 'border-ahly-red/40' : 'border-ahly-gold/30'}`} style={{ animationDelay: '1.5s' }}>
+                  <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${nextMatch.awayTeam.isAhly ? 'from-ahly-red/10 to-transparent' : 'from-ahly-gold/10 to-transparent'} animate-pulse-red`} />
+                  <img
+                    src={nextMatch.awayTeam.logo || ''}
+                    alt={nextMatch.awayTeam.name}
+                    className="w-full h-full object-contain relative z-10"
+                    onError={(e) => { (e.target as HTMLImageElement).style.display = 'none' }}
+                  />
+                  {!nextMatch.awayTeam.logo && (
+                    <span className="text-lg font-bold text-ahly-muted/50 relative z-10">
+                      {nextMatch.awayTeam.name.charAt(0)}
+                    </span>
+                  )}
+                </div>
+                <span className="text-xs font-semibold text-white/90 text-center max-w-24 leading-tight">
+                  {nextMatch.awayTeam.name}
+                </span>
+              </div>
+            </div>
+
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
               <CountdownTimer targetDate={nextMatch.date} targetTime={nextMatch.time} />
             </div>

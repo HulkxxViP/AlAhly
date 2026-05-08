@@ -33,6 +33,15 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
 
+        <div className="hidden md:flex items-center gap-1.5 text-[10px]">
+          <span className="text-ahly-muted/40">Created with</span>
+          <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-gradient-to-r from-ahly-red/10 via-ahly-red/20 to-ahly-red/10 border border-ahly-red/20">
+            <span className="animate-heart-pulse text-red-500" style={{ fontSize: '0.55rem' }}>❤</span>
+            <span className="font-medium bg-gradient-to-r from-ahly-gold to-ahly-red bg-clip-text text-transparent">By</span>
+            <span className="font-bold bg-gradient-to-r from-ahly-gold via-ahly-red to-ahly-gold bg-clip-text text-transparent bg-[length:200%_100%] animate-shimmer-text">Hulk</span>
+          </span>
+        </div>
+
         <div className="flex items-center gap-3">
           <button className="relative p-2 rounded-lg hover:bg-ahly-card text-ahly-muted hover:text-white transition-colors">
             <Bell className="w-5 h-5" />
