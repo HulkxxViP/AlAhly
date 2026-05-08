@@ -146,17 +146,13 @@ export default function Dashboard() {
         </button>
       </div>
 
-      {liveMatch && liveMatch.status === 'live' && (
-        <DashboardLiveBar match={liveMatch} eventIndex={dashboardEventIndex} />
-      )}
-
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {nextMatch && (
           <NextMatchHero match={nextMatch} />
         )}
 
         {liveMatch && liveMatch.status === 'live' ? (
-          <LiveMatchCard match={liveMatch} />
+          <LiveMatchCard match={liveMatch} eventIndex={dashboardEventIndex} />
         ) : nextMatch ? (
           <LiveWaitingCard match={nextMatch} />
         ) : (
@@ -400,7 +396,7 @@ function NextMatchHero({ match: nextMatch }: { match: Match }) {
   );
 }
 
-function DashboardLiveBar({ match, eventIndex: _ei }: { match: Match; eventIndex: number }) {
+function LiveMatchCard({ match, eventIndex: _ei }: { match: Match; eventIndex: number }) {
   const isAhlyHome = match.homeTeam.isAhly;
   const ahlyScore = isAhlyHome ? match.homeScore : match.awayScore;
   const oppScore = isAhlyHome ? match.awayScore : match.homeScore;
@@ -409,64 +405,13 @@ function DashboardLiveBar({ match, eventIndex: _ei }: { match: Match; eventIndex
   const event = events[_ei];
 
   return (
-    <div className="bg-gradient-to-r from-ahly-dark via-ahly-card to-ahly-dark border border-ahly-border/30 rounded-xl px-4 md:px-6">
-      <div className="flex items-center gap-2 md:gap-4 py-2 text-[11px] overflow-hidden">
-        <Link to="/live" className="flex items-center gap-1.5 shrink-0 group">
-          <span className="relative flex h-2 w-2">
-            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
-          </span>
-          <span className="text-xs font-bold text-red-400 tracking-wide">LIVE</span>
-        </Link>
-
-        <span className="text-ahly-text font-semibold truncate max-w-[80px]">Al Ahly</span>
-        <span className="font-bold text-white tabular-nums bg-ahly-dark/60 px-1.5 py-0.5 rounded">
-          {ahlyScore ?? '-'}:{oppScore ?? '-'}
-        </span>
-        <span className="text-ahly-muted truncate max-w-[80px] hidden sm:inline">{oppTeam}</span>
-        {match.minute && (
-          <span className="text-red-400 font-bold text-[10px]">{match.minute}&apos;</span>
-        )}
-
-        <div className="hidden md:flex items-center gap-1.5 text-ahly-muted flex-1 min-w-0 border-l border-ahly-border/20 pl-2">
-          {event ? (
-            <span className="animate-slide-right truncate flex items-center gap-1" key={`${event.minute}-${event.type}`}>
-              <span>{event.type === 'goal' ? '⚽' : event.type === 'yellow' ? '🟨' : event.type === 'red' ? '🟥' : '🔄'}</span>
-              <span className="tabular-nums">{event.minute}&apos;</span>
-              <span className="truncate">{event.player}</span>
-            </span>
-          ) : (
-            <span className="text-ahly-muted/40">No events</span>
-          )}
-          {events.length > 1 && (
-            <span className="text-[10px] text-ahly-muted/30 shrink-0 ml-auto">{_ei + 1}/{events.length}</span>
-          )}
-        </div>
-
-        <Link to="/live" className="ml-auto shrink-0 flex items-center gap-1 px-2 py-0.5 rounded bg-ahly-red/15 text-ahly-red border border-ahly-red/20 hover:bg-ahly-red/25 transition-all text-[10px] font-medium">
-          Watch <ChevronRight className="w-2.5 h-2.5" />
-        </Link>
-      </div>
-    </div>
-  );
-}
-
-function LiveMatchCard({ match }: { match: Match }) {
-  const isAhlyHome = match.homeTeam.isAhly;
-  const isAhlyAway = match.awayTeam.isAhly;
-  const ahlyScore = isAhlyHome ? match.homeScore : match.awayScore;
-  const oppScore = isAhlyHome ? match.awayScore : match.homeScore;
-  const ahlyWinning = ahlyScore !== null && oppScore !== null && ahlyScore > oppScore;
-  const isDraw = ahlyScore !== null && oppScore !== null && ahlyScore === oppScore;
-
-  return (
     <Link to="/live" className="block h-full">
-      <div className="bg-gradient-to-br from-ahly-red/20 via-ahly-card to-ahly-dark border border-ahly-red/30 rounded-2xl p-5 relative overflow-hidden h-full hover:border-ahly-red/50 transition-all group">
+      <div className="bg-gradient-to-br from-ahly-red/15 via-ahly-card to-ahly-dark border border-ahly-red/30 rounded-2xl p-5 relative overflow-hidden h-full hover:border-ahly-red/50 transition-all group">
         <div className="absolute top-0 right-0 w-32 h-32 opacity-[0.05]">
           <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
         </div>
 
-        <div className="relative z-10 h-full flex flex-col justify-between gap-3">
+        <div className="relative z-10 h-full flex flex-col justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
@@ -474,55 +419,39 @@ function LiveMatchCard({ match }: { match: Match }) {
             </span>
             <span className="text-xs font-bold text-red-400 tracking-wide">LIVE</span>
             {match.minute && (
-              <span className="text-xs font-bold text-white tabular-nums bg-red-500/20 px-1.5 py-0.5 rounded ml-1">
+              <span className="text-xs font-bold text-white tabular-nums bg-red-500/20 px-1.5 py-0.5 rounded">
                 {match.minute}&apos;
               </span>
             )}
           </div>
 
-          <div className="flex items-center justify-center gap-3">
-            <div className="flex flex-col items-center gap-1.5">
-              <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-ahly-dark/60 border-2 border-ahly-red/30 flex items-center justify-center p-1">
-                <LogoImage src={match.homeTeam.logo} name={match.homeTeam.name} isAhly={true} className="w-full h-full" />
-              </div>
-              <span className="text-[10px] text-white/70 text-center leading-tight truncate w-full max-w-16">
-                {match.homeTeam.name}
-              </span>
-            </div>
-
-            <div className="flex flex-col items-center">
-              <div className="flex items-center gap-1">
-                <span className={`text-2xl md:text-3xl font-black tabular-nums ${
-                  isAhlyHome && ahlyWinning ? 'text-green-400' : 'text-white'
-                }`}>
-                  {match.homeScore}
-                </span>
-                <span className="text-lg font-bold text-white/40">:</span>
-                <span className={`text-2xl md:text-3xl font-black tabular-nums ${
-                  isAhlyAway && ahlyWinning ? 'text-green-400' : 'text-white'
-                }`}>
-                  {match.awayScore}
-                </span>
-              </div>
-              <span className={`text-[10px] font-bold mt-0.5 ${ahlyWinning ? 'text-green-400' : isDraw ? 'text-yellow-400' : 'text-red-300'}`}>
-                {ahlyWinning ? 'LEADING' : isDraw ? 'DRAW' : 'TRAILING'}
-              </span>
-            </div>
-
-            <div className="flex flex-col items-center gap-1.5">
-              <div className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-ahly-dark/60 border-2 flex items-center justify-center p-1 ${match.awayTeam.isAhly ? 'border-ahly-red/30' : 'border-ahly-gold/20'}`}>
-                <LogoImage src={match.awayTeam.logo} name={match.awayTeam.name} isAhly={match.awayTeam.isAhly} className="w-full h-full" />
-              </div>
-              <span className="text-[10px] text-white/70 text-center leading-tight truncate w-full max-w-16">
-                {match.awayTeam.name}
-              </span>
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-ahly-text font-semibold">Al Ahly</span>
+            <span className="text-base font-black text-white tabular-nums bg-ahly-dark/60 px-2 py-0.5 rounded leading-none">
+              {ahlyScore ?? '-'}:{oppScore ?? '-'}
+            </span>
+            <span className="text-sm text-ahly-muted truncate">{oppTeam}</span>
           </div>
 
-          <div className="flex items-center justify-between text-[10px] text-white/50 border-t border-white/10 pt-2">
-            <span>{match.competition.name}</span>
-            <span className="flex items-center gap-1 text-ahly-red group-hover:gap-1.5 transition-all">
-              Watch <ChevronRight className="w-3 h-3" />
+          <div className="flex items-center gap-1.5 text-xs text-ahly-muted border-t border-ahly-border/20 pt-3">
+            {event ? (
+              <span className="animate-slide-right flex items-center gap-1.5" key={`${event.minute}-${event.type}`}>
+                {event.type === 'goal' ? <span className="text-sm">⚽</span> : event.type === 'yellow' ? <span>🟨</span> : event.type === 'red' ? <span>🟥</span> : <span>🔄</span>}
+                <span className="tabular-nums font-medium">{event.minute}&apos;</span>
+                <span className="truncate">{event.player}</span>
+              </span>
+            ) : (
+              <span className="text-ahly-muted/40">No events yet</span>
+            )}
+            {events.length > 1 && (
+              <span className="text-[10px] text-ahly-muted/30 ml-auto shrink-0">{_ei + 1}/{events.length}</span>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between text-[11px] border-t border-white/10 pt-3">
+            <span className="text-ahly-muted/60 font-medium">{match.competition.name}</span>
+            <span className="flex items-center gap-1 text-ahly-red group-hover:gap-1.5 transition-all font-medium">
+              Watch <ChevronRight className="w-3.5 h-3.5" />
             </span>
           </div>
         </div>
