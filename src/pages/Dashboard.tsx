@@ -37,9 +37,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [notificationsOn, setNotificationsOn] = useState(false);
   const [animatedStats, setAnimatedStats] = useState(false);
-  const [autoRefresh, setAutoRefresh] = useState(true);
   const statsRef = useRef<HTMLDivElement>(null);
-  const liveIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const livePollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { requestPermission, notify } = useNotifications();
   const { addToast } = useToast();
 
@@ -68,17 +67,15 @@ export default function Dashboard() {
   }, []);
 
   useEffect(() => {
-    if (liveIntervalRef.current) clearInterval(liveIntervalRef.current);
-    if (autoRefresh) {
-      liveIntervalRef.current = setInterval(async () => {
-        const live = await getLiveMatch();
-        setLiveMatch(live);
-      }, 30000);
-    }
+    if (livePollingRef.current) clearInterval(livePollingRef.current);
+    livePollingRef.current = setInterval(async () => {
+      const live = await getLiveMatch();
+      setLiveMatch(live);
+    }, 30000);
     return () => {
-      if (liveIntervalRef.current) clearInterval(liveIntervalRef.current);
+      if (livePollingRef.current) clearInterval(livePollingRef.current);
     };
-  }, [autoRefresh]);
+  }, []);
 
   useEffect(() => {
     if (!loading && !animatedStats) {
@@ -376,6 +373,7 @@ function SectionHeader({
 
 function LiveMatchTracker({ match }: { match: Match }) {
   const [simMinute, setSimMinute] = useState(match.minute || 0);
+  const [autoRefresh, setAutoRefresh] = useState(true);
 
   useEffect(() => {
     setSimMinute(match.minute || 0);

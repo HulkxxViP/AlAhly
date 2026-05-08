@@ -54,7 +54,7 @@ export default function AppFooter() {
         <div className="bg-gradient-to-r from-ahly-dark via-ahly-card to-ahly-dark border-b border-ahly-border/30">
           <div className="max-w-6xl mx-auto px-4 md:px-6">
             {hasLiveData ? (
-              <LiveBar match={liveMatch} event={currentEvent} totalEvents={recentEvents.length} />
+              <LiveBar match={liveMatch} event={currentEvent} totalEvents={recentEvents.length} currentEventIndex={currentEventIndex} />
             ) : nextMatch ? (
               <NextMatchBar match={nextMatch} />
             ) : lastResult ? (
@@ -103,7 +103,7 @@ export default function AppFooter() {
   );
 }
 
-function LiveBar({ match, event, totalEvents }: { match: Match; event?: MatchEvent; totalEvents: number }) {
+function LiveBar({ match, event, totalEvents, currentEventIndex: _index }: { match: Match; event?: MatchEvent; totalEvents: number; currentEventIndex: number }) {
   const isAhlyHome = match.homeTeam.isAhly;
   const ahlyScore = isAhlyHome ? match.homeScore : match.awayScore;
   const oppScore = isAhlyHome ? match.awayScore : match.homeScore;
@@ -159,7 +159,7 @@ function LiveBar({ match, event, totalEvents }: { match: Match; event?: MatchEve
         )}
         {totalEvents > 1 && (
           <span className="text-[10px] text-ahly-muted/40 shrink-0 ml-auto">
-            {currentEventIndex + 1}/{totalEvents}
+            {_index + 1}/{totalEvents}
           </span>
         )}
       </div>
