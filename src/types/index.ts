@@ -119,3 +119,12 @@ export interface TVChannel {
   isOnline?: boolean;
   lastChecked?: string;
 }
+
+export interface MatchGalleryItem {
+  id: string;
+  imageUrl: string;
+  caption: string;
+  matchId: number;
+  matchTitle: string;
+  date: string;
+}

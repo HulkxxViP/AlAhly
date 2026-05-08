@@ -1,4 +1,4 @@
-import { Match, Standing, NewsItem, Player, Competition, StreamSource, TeamStats, LeagueMatch } from '../types';
+import { Match, Standing, NewsItem, Player, Competition, StreamSource, TeamStats, LeagueMatch, MatchGalleryItem } from '../types';
 
 export const AHLY_TEAM = {
   id: 1577,
@@ -799,5 +799,40 @@ export const historicalMatches: Match[] = [
       { minute: 38, type: 'goal', player: 'Trezeguet', team: 'home' },
       { minute: 66, type: 'goal', player: 'Wessam Abou Ali', team: 'home' },
     ],
+  },
+];
+
+export const matchGallery: MatchGalleryItem[] = [
+  {
+    id: 'g1',
+    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000378896-69fa4f27affd4.jpg',
+    caption: 'Al Ahly ease past Enppi 3-0 in Egyptian League to keep title hopes alive',
+    matchId: 3,
+    matchTitle: 'Al Ahly 3-0 ENPPI',
+    date: '2026-05-05',
+  },
+  {
+    id: 'g2',
+    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000376037-69f513b1c6d0d.jpg',
+    caption: 'Bencharki leads Al Ahly to 3-0 win over Zamalek in Cairo derby',
+    matchId: 2,
+    matchTitle: 'Zamalek 0-3 Al Ahly',
+    date: '2026-05-01',
+  },
+  {
+    id: 'g3',
+    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000373775-69efbe2c1f8f1.jpg',
+    caption: 'Al Ahly beaten by Pyramids FC in Egyptian Premier League',
+    matchId: 4,
+    matchTitle: 'Pyramids 3-0 Al Ahly',
+    date: '2026-04-27',
+  },
+  {
+    id: 'g4',
+    imageUrl: 'https://alahly-images.s3.us-east-2.amazonaws.com/Article/original/1000378320-69f8da93f4232.jpg',
+    caption: 'Al Ahly injury update ahead of Enppi league clash - Trezeguet sidelined',
+    matchId: 3,
+    matchTitle: 'Al Ahly 3-0 ENPPI',
+    date: '2026-05-04',
   },
 ];

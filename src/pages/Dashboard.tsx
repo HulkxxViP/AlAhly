@@ -4,7 +4,6 @@ import {
   Trophy,
   Target,
   Shield,
-  TrendingUp,
   ChevronRight,
   Flame,
   Swords,
@@ -16,23 +15,24 @@ import {
   Activity,
   Goal,
   Clock,
+  Camera,
 } from 'lucide-react';
 import MatchCard from '../components/MatchCard';
 import StandingsTable from '../components/StandingsTable';
 import NewsCard from '../components/NewsCard';
 import CountdownTimer from '../components/CountdownTimer';
 import LiveScoreTicker from '../components/LiveScoreTicker';
+import MatchGallery from '../components/MatchGallery';
 import { useNotifications } from '../hooks/useNotifications';
 import { useToast } from '../context/ToastContext';
-import { getRecentMatches, getUpcomingMatches, getLiveMatch, getStandings, getNews, getTeamStats } from '../services/api';
-import { Match, Standing, NewsItem, TeamStats, MatchEvent } from '../types';
+import { getRecentMatches, getUpcomingMatches, getLiveMatch, getStandings, getTeamStats } from '../services/api';
+import { Match, Standing, TeamStats, MatchEvent } from '../types';
 
 export default function Dashboard() {
   const [recentMatches, setRecentMatches] = useState<Match[]>([]);
   const [upcoming, setUpcoming] = useState<Match[]>([]);
   const [liveMatch, setLiveMatch] = useState<Match | null>(null);
   const [standingsData, setStandings] = useState<Standing[]>([]);
-  const [news, setNews] = useState<NewsItem[]>([]);
   const [stats, setStats] = useState<TeamStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [notificationsOn, setNotificationsOn] = useState(false);
@@ -46,19 +46,17 @@ export default function Dashboard() {
   useEffect(() => {
     async function fetchAll() {
       try {
-        const [matches, upcomingData, live, standings, newsData, statsData] = await Promise.all([
+        const [matches, upcomingData, live, standings, statsData] = await Promise.all([
           getRecentMatches(),
           getUpcomingMatches(),
           getLiveMatch(),
           getStandings(),
-          getNews(),
           getTeamStats(),
         ]);
         setRecentMatches(matches);
         setUpcoming(upcomingData);
         setLiveMatch(live);
         setStandings(standings);
-        setNews(newsData);
         setStats(statsData);
       } finally {
         setLoading(false);
@@ -219,12 +217,8 @@ export default function Dashboard() {
       </div>
 
       <div>
-        <SectionHeader title="Latest News" icon={<TrendingUp />} link="/news" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 stagger-fade">
-          {news.slice(0, 3).map((item, i) => (
-            <NewsCard key={item.id} news={item} featured={i === 0} />
-          ))}
-        </div>
+        <SectionHeader title="Latest Match Photos" icon={<Camera />} link="/matches" />
+        <MatchGallery limit={2} />
       </div>
     </div>
   );
