@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Menu, Bell, Search, X, Trophy, Calendar, Newspaper, Users, ExternalLink } from 'lucide-react';
+import { useNavigate, Link } from 'react-router-dom';
+import { Menu, Bell, Search, X, Trophy, Calendar, Newspaper, Users, ExternalLink, Clock, ChevronRight, Zap } from 'lucide-react';
 import { recentMatches, upcomingMatches, mockNews, squad } from '../data/mockData';
+import { getLiveMatch, getUpcomingMatches, getRecentMatches } from '../services/api';
+import { Match, MatchEvent } from '../types';
 
 const basePath = import.meta.env.BASE_URL;
 
@@ -27,6 +29,37 @@ export default function Header({ onMenuClick }: HeaderProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const mobileInputRef = useRef<HTMLInputElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const [headerLiveMatch, setHeaderLiveMatch] = useState<Match | null>(null);
+  const [headerNextMatch, setHeaderNextMatch] = useState<Match | null>(null);
+  const [headerLastResult, setHeaderLastResult] = useState<Match | null>(null);
+  const [headerEventIndex, setHeaderEventIndex] = useState(0);
+
+  useEffect(() => {
+    async function fetchData() {
+      const [live, upcoming, recent] = await Promise.all([
+        getLiveMatch(),
+        getUpcomingMatches(),
+        getRecentMatches(),
+      ]);
+      setHeaderLiveMatch(live);
+      setHeaderNextMatch(upcoming?.[0] || null);
+      if (recent.length > 0) setHeaderLastResult(recent[0]);
+    }
+    fetchData();
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    if (!headerLiveMatch?.events || headerLiveMatch.events.length <= 1) return;
+    const tick = setInterval(() => {
+      setHeaderEventIndex((prev) =>
+        prev >= (headerLiveMatch.events?.length ?? 1) - 1 ? 0 : prev + 1
+      );
+    }, 4000);
+    return () => clearInterval(tick);
+  }, [headerLiveMatch?.events?.length]);
 
   const search = useCallback((q: string) => {
     if (!q.trim()) { setResults([]); return; }
@@ -266,6 +299,168 @@ export default function Header({ onMenuClick }: HeaderProps) {
           )}
         </div>
       )}
+
+      <HeaderLiveBar
+        liveMatch={headerLiveMatch}
+        nextMatch={headerNextMatch}
+        lastResult={headerLastResult}
+        eventIndex={headerEventIndex}
+      />
     </header>
+  );
+}
+
+function HeaderLiveBar({ liveMatch, nextMatch, lastResult, eventIndex }: { liveMatch: Match | null; nextMatch: Match | null; lastResult: Match | null; eventIndex: number }) {
+  const hasLive = liveMatch && liveMatch.status === 'live';
+  const events = liveMatch?.events || [];
+  const currentEvent = events[eventIndex];
+
+  return (
+    <div className="border-t border-ahly-border/30 bg-gradient-to-r from-ahly-dark via-ahly-card to-ahly-dark">
+      <div className="max-w-6xl mx-auto px-4 md:px-6">
+        {hasLive ? (
+          <HeaderLiveBarInner match={liveMatch!} event={currentEvent} totalEvents={events.length} eventIndex={eventIndex} />
+        ) : nextMatch ? (
+          <HeaderNextBar match={nextMatch} />
+        ) : lastResult ? (
+          <HeaderLastBar match={lastResult} />
+        ) : (
+          <div className="h-8" />
+        )}
+      </div>
+    </div>
+  );
+}
+
+function HeaderLiveBarInner({ match, event, totalEvents, eventIndex: _ei }: { match: Match; event?: MatchEvent; totalEvents: number; eventIndex: number }) {
+  const isAhlyHome = match.homeTeam.isAhly;
+  const ahlyScore = isAhlyHome ? match.homeScore : match.awayScore;
+  const oppScore = isAhlyHome ? match.awayScore : match.homeScore;
+  const oppTeam = isAhlyHome ? match.awayTeam.name : match.homeTeam.name;
+
+  return (
+    <div className="flex items-center gap-2 md:gap-4 py-1.5 text-[11px] overflow-hidden">
+      <Link to="/live" className="flex items-center gap-1.5 shrink-0 group">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+        </span>
+        <span className="text-xs font-bold text-red-400 tracking-wide">LIVE</span>
+      </Link>
+
+      <span className="text-ahly-text font-semibold truncate max-w-[80px]">Al Ahly</span>
+      <span className="font-bold text-white tabular-nums bg-ahly-dark/60 px-1.5 py-0.5 rounded">
+        {ahlyScore ?? '-'}:{oppScore ?? '-'}
+      </span>
+      <span className="text-ahly-muted truncate max-w-[80px] hidden sm:inline">{oppTeam}</span>
+      {match.minute && (
+        <span className="text-red-400 font-bold text-[10px]">{match.minute}&apos;</span>
+      )}
+
+      <div className="hidden md:flex items-center gap-1.5 text-ahly-muted flex-1 min-w-0 border-l border-ahly-border/20 pl-2">
+        {event ? (
+          <span className="animate-slide-right truncate flex items-center gap-1" key={`${event.minute}-${event.type}`}>
+            <span>{event.type === 'goal' ? '⚽' : event.type === 'yellow' ? '🟨' : event.type === 'red' ? '🟥' : '🔄'}</span>
+            <span className="tabular-nums">{event.minute}&apos;</span>
+            <span className="truncate">{event.player}</span>
+          </span>
+        ) : (
+          <span className="text-ahly-muted/40">No events</span>
+        )}
+        {totalEvents > 1 && (
+          <span className="text-[10px] text-ahly-muted/30 shrink-0 ml-auto">{_ei + 1}/{totalEvents}</span>
+        )}
+      </div>
+
+      <Link to="/live" className="ml-auto shrink-0 flex items-center gap-1 px-2 py-0.5 rounded bg-ahly-red/15 text-ahly-red border border-ahly-red/20 hover:bg-ahly-red/25 transition-all text-[10px] font-medium">
+        Watch <ChevronRight className="w-2.5 h-2.5" />
+      </Link>
+    </div>
+  );
+}
+
+function HeaderNextBar({ match }: { match: Match }) {
+  const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 });
+
+  useEffect(() => {
+    const target = new Date(`${match.date}T${match.time}:00`);
+    const update = () => {
+      const diff = target.getTime() - Date.now();
+      if (diff <= 0) { setTimeLeft({ d: 0, h: 0, m: 0, s: 0 }); return; }
+      setTimeLeft({
+        d: Math.floor(diff / 86400000),
+        h: Math.floor((diff % 86400000) / 3600000),
+        m: Math.floor((diff % 3600000) / 60000),
+        s: Math.floor((diff % 60000) / 1000),
+      });
+    };
+    update();
+    const interval = setInterval(update, 1000);
+    return () => clearInterval(interval);
+  }, [match.date, match.time]);
+
+  return (
+    <div className="flex items-center gap-2 md:gap-4 py-1.5 text-[11px] overflow-hidden">
+      <div className="flex items-center gap-1.5 shrink-0">
+        <Clock className="w-3 h-3 text-ahly-gold" />
+        <span className="text-ahly-gold font-bold text-[10px] tracking-wide uppercase">Next</span>
+      </div>
+
+      <span className="text-ahly-text font-semibold truncate max-w-[80px]">{match.homeTeam.name}</span>
+      <span className="text-ahly-muted/40 text-[10px]">vs</span>
+      <span className="text-ahly-text font-semibold truncate max-w-[80px]">{match.awayTeam.name}</span>
+
+      <div className="hidden md:flex items-center gap-1 ml-auto shrink-0 tabular-nums text-[11px]">
+        {timeLeft.d > 0 && (
+          <span className="bg-ahly-card border border-ahly-border rounded px-1 py-0.5 leading-none">
+            <span className="text-white font-bold">{timeLeft.d}</span><span className="text-ahly-muted text-[9px] ml-0.5">d</span>
+          </span>
+        )}
+        <span className="bg-ahly-card border border-ahly-border rounded px-1 py-0.5 leading-none">
+          <span className="text-white font-bold">{String(timeLeft.h).padStart(2, '0')}</span><span className="text-ahly-muted text-[9px] ml-0.5">h</span>
+        </span>
+        <span className="text-white font-bold">:</span>
+        <span className="bg-ahly-card border border-ahly-border rounded px-1 py-0.5 leading-none">
+          <span className="text-white font-bold">{String(timeLeft.m).padStart(2, '0')}</span><span className="text-ahly-muted text-[9px] ml-0.5">m</span>
+        </span>
+        <span className="text-white font-bold">:</span>
+        <span className="bg-ahly-card border border-ahly-border rounded px-1 py-0.5 leading-none">
+          <span className="text-white font-bold">{String(timeLeft.s).padStart(2, '0')}</span><span className="text-ahly-muted text-[9px] ml-0.5">s</span>
+        </span>
+      </div>
+
+      <Link to="/matches" className="ml-auto md:ml-2 shrink-0 text-ahly-muted/50 hover:text-ahly-muted transition-colors text-[10px]">
+        Details <ChevronRight className="w-2.5 h-2.5 inline" />
+      </Link>
+    </div>
+  );
+}
+
+function HeaderLastBar({ match }: { match: Match }) {
+  const isAhly = match.homeTeam.isAhly || match.awayTeam.isAhly;
+  const ahlyWon = isAhly && (
+    (match.homeTeam.isAhly && (match.homeScore ?? 0) > (match.awayScore ?? 0)) ||
+    (match.awayTeam.isAhly && (match.awayScore ?? 0) > (match.homeScore ?? 0))
+  );
+
+  return (
+    <div className="flex items-center gap-2 md:gap-4 py-1.5 text-[11px] overflow-hidden">
+      <Trophy className={`w-3 h-3 shrink-0 ${ahlyWon ? 'text-ahly-gold' : 'text-ahly-muted'}`} />
+      <span className={`font-bold text-[10px] tracking-wide uppercase shrink-0 ${ahlyWon ? 'text-green-400' : 'text-ahly-muted'}`}>
+        {ahlyWon ? 'Win' : match.homeScore === match.awayScore ? 'Draw' : 'Loss'}
+      </span>
+
+      <span className="text-ahly-text font-semibold truncate max-w-[80px]">{match.homeTeam.name}</span>
+      <span className="font-bold text-white bg-ahly-dark/60 px-1.5 py-0.5 rounded tabular-nums">
+        {match.homeScore ?? '-'}:{match.awayScore ?? '-'}
+      </span>
+      <span className="text-ahly-text font-semibold truncate max-w-[80px] hidden sm:inline">{match.awayTeam.name}</span>
+
+      <span className="hidden md:inline text-ahly-muted/40 ml-auto truncate max-w-[120px]">{match.competition.name}</span>
+
+      <Link to="/matches" className="shrink-0 text-ahly-muted/40 hover:text-ahly-muted transition-colors text-[10px] ml-2">
+        All <ChevronRight className="w-2.5 h-2.5 inline" />
+      </Link>
+    </div>
   );
 }
