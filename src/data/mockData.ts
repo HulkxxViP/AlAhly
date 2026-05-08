@@ -291,13 +291,13 @@ export const upcomingMatches: Match[] = [
 ];
 
 export const standings: Standing[] = [
-  { position: 1, team: teams.zamalek, played: 39, won: 20, drawn: 10, lost: 9, goalsFor: 50, goalsAgainst: 30, goalDifference: 20, points: 53, form: ['W', 'W', 'L', 'W', 'D'] },
-  { position: 2, team: teams.pyramids, played: 39, won: 19, drawn: 11, lost: 9, goalsFor: 52, goalsAgainst: 35, goalDifference: 17, points: 51, form: ['W', 'D', 'W', 'D', 'W'] },
-  { position: 3, team: AHLY_TEAM, played: 39, won: 17, drawn: 13, lost: 9, goalsFor: 49, goalsAgainst: 32, goalDifference: 17, points: 49, form: ['W', 'L', 'L', 'W', 'D'] },
-  { position: 4, team: teams.ceramica, played: 39, won: 14, drawn: 12, lost: 13, goalsFor: 40, goalsAgainst: 35, goalDifference: 5, points: 46, form: ['D', 'D', 'W', 'L', 'W'] },
-  { position: 5, team: teams.alMasry, played: 39, won: 12, drawn: 14, lost: 13, goalsFor: 38, goalsAgainst: 40, goalDifference: -2, points: 42, form: ['D', 'W', 'D', 'L', 'W'] },
-  { position: 6, team: teams.enppiBc, played: 39, won: 10, drawn: 14, lost: 15, goalsFor: 35, goalsAgainst: 45, goalDifference: -10, points: 37, form: ['L', 'L', 'D', 'W', 'D'] },
-  { position: 7, team: teams.smouha, played: 39, won: 9, drawn: 12, lost: 18, goalsFor: 28, goalsAgainst: 40, goalDifference: -12, points: 35, form: ['L', 'L', 'L', 'D', 'L'] },
+  { position: 1, team: teams.zamalek, played: 25, won: 16, drawn: 5, lost: 4, goalsFor: 38, goalsAgainst: 17, goalDifference: 21, points: 53, form: ['W', 'D', 'D', 'W', 'L'] },
+  { position: 2, team: teams.pyramids, played: 25, won: 15, drawn: 6, lost: 4, goalsFor: 41, goalsAgainst: 20, goalDifference: 21, points: 51, form: ['D', 'W', 'D', 'W', 'W'] },
+  { position: 3, team: AHLY_TEAM, played: 25, won: 14, drawn: 8, lost: 3, goalsFor: 42, goalsAgainst: 24, goalDifference: 18, points: 50, form: ['W', 'W', 'L', 'W', 'D'] },
+  { position: 4, team: teams.ceramica, played: 25, won: 12, drawn: 8, lost: 5, goalsFor: 34, goalsAgainst: 20, goalDifference: 14, points: 44, form: ['D', 'L', 'D', 'D', 'D'] },
+  { position: 5, team: teams.alMasry, played: 25, won: 10, drawn: 10, lost: 5, goalsFor: 35, goalsAgainst: 27, goalDifference: 8, points: 40, form: ['D', 'W', 'D', 'W', 'L'] },
+  { position: 6, team: teams.enppiBc, played: 26, won: 8, drawn: 12, lost: 6, goalsFor: 27, goalsAgainst: 25, goalDifference: 2, points: 36, form: ['D', 'L', 'D', 'D', 'D'] },
+  { position: 7, team: teams.smouha, played: 25, won: 8, drawn: 7, lost: 10, goalsFor: 22, goalsAgainst: 21, goalDifference: 1, points: 31, form: ['L', 'L', 'L', 'L', 'L'] },
 ];
 
 export const mockNews: NewsItem[] = [
@@ -420,13 +420,13 @@ export const streamSources: StreamSource[] = [
 ];
 
 export const teamStats: TeamStats = {
-  totalMatches: 39,
-  wins: 17,
-  draws: 13,
-  losses: 9,
-  goalsScored: 49,
-  goalsConceded: 32,
-  cleanSheets: 14,
+  totalMatches: 25,
+  wins: 14,
+  draws: 8,
+  losses: 3,
+  goalsScored: 42,
+  goalsConceded: 24,
+  cleanSheets: 10,
   topScorer: { name: 'Wessam Abou Ali', goals: 14 },
   topAssister: { name: 'Percy Tau', assists: 9 },
 };

@@ -100,11 +100,11 @@ export default function Standings() {
               </h3>
               <div className="space-y-2">
                 {[
-                  { name: 'Wessam Abou Ali', goals: 12 },
-                  { name: 'Taher Mohamed', goals: 8 },
-                  { name: 'Hussein El Shahat', goals: 7 },
-                  { name: 'Aliou Dieng', goals: 5 },
-                  { name: 'Mohamed Sherif', goals: 4 },
+                  { name: 'Wessam Abou Ali', goals: 14 },
+                  { name: 'Trezeguet', goals: 11 },
+                  { name: 'Hussein El Shahat', goals: 9 },
+                  { name: 'Emam Ashour', goals: 8 },
+                  { name: 'Percy Tau', goals: 7 },
                 ].map((scorer, i) => (
                   <div
                     key={i}
