@@ -33,6 +33,8 @@ export default {
         'live-pulse': 'livePulse 1.5s ease-in-out infinite',
         'slide-right': 'slideRight 0.4s ease-out',
         'scale-in': 'scaleIn 0.3s ease-out',
+        'heart-pulse': 'heartPulse 1.5s ease-in-out infinite',
+        'shimmer-text': 'shimmerText 3s ease-in-out infinite',
       },
       keyframes: {
         pulseRed: {
@@ -81,6 +83,14 @@ export default {
         scaleIn: {
           '0%': { transform: 'scale(0.95)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
+        },
+        heartPulse: {
+          '0%, 100%': { transform: 'scale(1)', opacity: '1' },
+          '50%': { transform: 'scale(1.25)', opacity: '0.8' },
+        },
+        shimmerText: {
+          '0%': { backgroundPosition: '200% 0' },
+          '100%': { backgroundPosition: '-200% 0' },
         },
       },
     },
