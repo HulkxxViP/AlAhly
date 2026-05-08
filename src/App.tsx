@@ -11,6 +11,7 @@ import LiveTv from './pages/LiveTv';
 import Squad from './pages/Squad';
 import Settings from './pages/Settings';
 import HistoryPage from './pages/History';
+import MusicPlayer from './components/MusicPlayer';
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -45,6 +46,8 @@ export default function App() {
           </div>
         </footer>
       </div>
+
+      <MusicPlayer />
     </div>
   );
 }
