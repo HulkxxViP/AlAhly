@@ -1,45 +1,99 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 240">
   <defs>
-    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <linearGradient id="shieldGrad" x1="0%" y1="0%" x2="0%" y2="100%">
       <stop offset="0%" style="stop-color:#C8102E"/>
-      <stop offset="100%" style="stop-color:#8B0000"/>
+      <stop offset="100%" style="stop-color:#9B0A1E"/>
     </linearGradient>
     <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#FFD700"/>
       <stop offset="50%" style="stop-color:#D4AF37"/>
       <stop offset="100%" style="stop-color:#B8860B"/>
     </linearGradient>
+    <linearGradient id="eagleGold" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFD700"/>
+      <stop offset="100%" style="stop-color:#C5960E"/>
+    </linearGradient>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="110%">
+      <feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
   </defs>
-  <!-- Shield background -->
-  <path d="M100 10 L175 40 L175 110 Q175 160 100 190 Q25 160 25 110 L25 40 Z" fill="url(#shieldGrad)" stroke="url(#goldGrad)" stroke-width="3"/>
-  <!-- Inner shield border -->
-  <path d="M100 20 L165 46 L165 108 Q165 152 100 180 Q35 152 35 108 L35 46 Z" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" opacity="0.6"/>
-  <!-- Eagle body -->
-  <g fill="white" opacity="0.95">
-    <!-- Eagle head -->
-    <ellipse cx="100" cy="58" rx="12" ry="10"/>
-    <!-- Beak -->
-    <path d="M112 58 L122 62 L112 63 Z"/>
-    <!-- Eye -->
-    <circle cx="106" cy="56" r="2" fill="#C8102E"/>
+
+  <!-- Outer shield -->
+  <path d="M100 8 L180 42 L180 120 Q180 180 100 218 Q20 180 20 120 L20 42 Z"
+        fill="url(#goldGrad)" />
+  <!-- Inner shield (red) -->
+  <path d="M100 16 L172 46 L172 118 Q172 174 100 210 Q28 174 28 118 L28 46 Z"
+        fill="url(#shieldGrad)" />
+  <!-- Inner decorative border -->
+  <path d="M100 24 L164 50 L164 116 Q164 168 100 202 Q36 168 36 116 L36 50 Z"
+        fill="none" stroke="url(#goldGrad)" stroke-width="1" opacity="0.4"/>
+
+  <!-- Eagle -->
+  <g fill="url(#eagleGold)" filter="url(#shadow)">
+    <!-- Left wing - layered feathers -->
+    <path d="M92 80 Q78 62 55 48 Q48 46 38 48 Q45 55 50 60
+             Q42 56 32 56 Q40 64 50 68
+             Q42 66 34 68 Q44 74 54 76
+             Q46 76 40 80 Q52 82 62 80
+             L80 86 Z"/>
+    <!-- Right wing - layered feathers -->
+    <path d="M108 80 Q122 62 145 48 Q152 46 162 48 Q155 55 150 60
+             Q158 56 168 56 Q160 64 150 68
+             Q158 66 166 68 Q156 74 146 76
+             Q154 76 160 80 Q148 82 138 80
+             L120 86 Z"/>
+
     <!-- Eagle body -->
-    <ellipse cx="100" cy="82" rx="18" ry="20"/>
-    <!-- Left wing spread -->
-    <path d="M82 72 Q60 50 42 55 Q50 65 58 70 Q48 68 38 72 Q50 78 62 78 Q52 80 45 86 Q58 86 70 82 L82 82 Z"/>
-    <!-- Right wing spread -->
-    <path d="M118 72 Q140 50 158 55 Q150 65 142 70 Q152 68 162 72 Q150 78 138 78 Q148 80 155 86 Q142 86 130 82 L118 82 Z"/>
+    <ellipse cx="100" cy="90" rx="16" ry="18"/>
+
+    <!-- Neck -->
+    <path d="M94 74 Q100 68 106 74 L108 82 Q100 78 92 82 Z"/>
+
+    <!-- Head -->
+    <ellipse cx="100" cy="62" rx="10" ry="9"/>
+
+    <!-- Beak (pointing right) -->
+    <path d="M110 62 L120 66 L110 67 Z" fill="#B8860B"/>
+    <path d="M110 62 L118 64 L110 65 Z" fill="#D4AF37"/>
+
+    <!-- Eye -->
+    <circle cx="105" cy="60" r="2.5" fill="#8B0000"/>
+    <circle cx="105.5" cy="59.5" r="1" fill="#1a0000"/>
+    <circle cx="106" cy="59" r="0.4" fill="white"/>
+
+    <!-- Chest shield / breast detail -->
+    <ellipse cx="100" cy="90" rx="8" ry="10" fill="#C8102E" opacity="0.5"/>
+
     <!-- Tail feathers -->
-    <path d="M90 100 L85 125 L92 118 L97 128 L100 120 L103 128 L108 118 L115 125 L110 100 Z"/>
-    <!-- Talons left -->
-    <path d="M88 100 L82 112 L86 110 L83 116 L88 112" stroke="white" stroke-width="1.5" fill="none"/>
-    <!-- Talons right -->
-    <path d="M112 100 L118 112 L114 110 L117 116 L112 112" stroke="white" stroke-width="1.5" fill="none"/>
+    <path d="M88 106 L82 132 L88 124 L93 134 L97 126 L100 136 L103 126 L107 134 L112 124 L118 132 L112 106 Z"/>
+
+    <!-- Left talon -->
+    <g stroke="#B8860B" stroke-width="1.8" fill="none" stroke-linecap="round">
+      <path d="M90 106 L84 118"/>
+      <path d="M84 118 L80 124"/>
+      <path d="M84 118 L84 125"/>
+      <path d="M84 118 L88 124"/>
+    </g>
+    <!-- Right talon -->
+    <g stroke="#B8860B" stroke-width="1.8" fill="none" stroke-linecap="round">
+      <path d="M110 106 L116 118"/>
+      <path d="M116 118 L120 124"/>
+      <path d="M116 118 L116 125"/>
+      <path d="M116 118 L112 124"/>
+    </g>
   </g>
+
   <!-- Star above eagle -->
-  <path d="M100 30 L103 38 L111 38 L105 43 L107 51 L100 47 L93 51 L95 43 L89 38 L97 38 Z" fill="url(#goldGrad)"/>
+  <path d="M100 28 L103.5 37 L113 37 L105.5 43 L108 52 L100 46.5 L92 52 L94.5 43 L87 37 L96.5 37 Z"
+        fill="url(#goldGrad)"/>
+
   <!-- Club name banner -->
-  <path d="M55 140 Q100 132 145 140 L145 158 Q100 166 55 158 Z" fill="url(#goldGrad)" opacity="0.9"/>
-  <text x="100" y="153" text-anchor="middle" fill="#8B0000" font-size="13" font-weight="bold" font-family="Arial">AL AHLY</text>
+  <path d="M50 154 Q100 146 150 154 L150 174 Q100 182 50 174 Z" fill="url(#goldGrad)" opacity="0.95"/>
+  <text x="100" y="168" text-anchor="middle" fill="#8B0000" font-size="14" font-weight="bold" font-family="serif" letter-spacing="2">AL AHLY</text>
+
+  <!-- Arabic name -->
+  <text x="100" y="190" text-anchor="middle" fill="url(#goldGrad)" font-size="12" font-weight="bold" font-family="Arial" direction="rtl" unicode-bidi="bidi-override">النادي الأهلي</text>
+
   <!-- Year -->
-  <text x="100" y="172" text-anchor="middle" fill="url(#goldGrad)" font-size="10" font-weight="bold" font-family="Arial">1907</text>
+  <text x="100" y="205" text-anchor="middle" fill="url(#goldGrad)" font-size="10" font-weight="bold" font-family="serif" letter-spacing="1">1907</text>
 </svg>

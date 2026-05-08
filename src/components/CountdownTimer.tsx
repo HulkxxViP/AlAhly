@@ -44,8 +44,8 @@ export default function CountdownTimer({ targetDate, targetTime }: CountdownTime
     <div className="flex items-center gap-3">
       {blocks.map((block) => (
         <div key={block.label} className="flex flex-col items-center">
-          <div className="bg-ahly-dark/80 border border-ahly-red/30 rounded-lg w-16 h-16 flex items-center justify-center">
-            <span className="text-2xl font-bold text-white">
+          <div className="bg-ahly-dark/60 border border-ahly-red/30 rounded-lg w-16 h-16 flex items-center justify-center backdrop-blur-sm">
+            <span className="text-2xl font-bold text-white tabular-nums">
               {String(block.value).padStart(2, '0')}
             </span>
           </div>

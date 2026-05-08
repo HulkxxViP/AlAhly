@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Users, Filter } from 'lucide-react';
 import PlayerCard from '../components/PlayerCard';
+import PlayerModal from '../components/PlayerModal';
 import { getSquad } from '../services/api';
 import { Player } from '../types';
 
@@ -10,6 +11,7 @@ export default function Squad() {
   const [players, setPlayers] = useState<Player[]>([]);
   const [filter, setFilter] = useState<PositionFilter>('all');
   const [loading, setLoading] = useState(true);
+  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -34,7 +36,7 @@ export default function Squad() {
   };
 
   return (
-    <div className="animate-fade-in">
+    <div className="page-enter">
       <div className="flex items-center gap-3 mb-6">
         <Users className="w-7 h-7 text-ahly-red" />
         <h1 className="page-header mb-0">Squad</h1>
@@ -65,47 +67,55 @@ export default function Squad() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-12 h-12 border-4 border-ahly-red/30 border-t-ahly-red rounded-full animate-spin" />
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="skeleton h-40 rounded-xl" />
+          ))}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 stagger-fade">
           {filtered
             .sort((a, b) => {
               const posOrder = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'];
               return posOrder.indexOf(a.position) - posOrder.indexOf(b.position) || a.number - b.number;
             })
             .map((player) => (
-              <PlayerCard key={player.id} player={player} />
+              <PlayerCard key={player.id} player={player} onClick={() => setSelectedPlayer(player)} />
             ))}
         </div>
       )}
 
-      <div className="mt-8 glass-card p-5">
-        <h3 className="text-sm font-semibold text-white mb-3">Season Stats Summary</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <StatItem
-            label="Total Goals"
-            value={String(players.reduce((s, p) => s + (p.goals || 0), 0))}
-            color="text-green-400"
-          />
-          <StatItem
-            label="Total Assists"
-            value={String(players.reduce((s, p) => s + (p.assists || 0), 0))}
-            color="text-blue-400"
-          />
-          <StatItem
-            label="Squad Size"
-            value={String(players.length)}
-            color="text-ahly-gold"
-          />
-          <StatItem
-            label="Avg Age"
-            value={String(Math.round(players.reduce((s, p) => s + p.age, 0) / players.length))}
-            color="text-purple-400"
-          />
+      {selectedPlayer && (
+        <PlayerModal player={selectedPlayer} onClose={() => setSelectedPlayer(null)} />
+      )}
+
+      {!loading && (
+        <div className="mt-8 glass-card-elevated p-5">
+          <h3 className="text-sm font-semibold text-white mb-3">Season Stats Summary</h3>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 stagger-fade">
+            <StatItem
+              label="Total Goals"
+              value={String(players.reduce((s, p) => s + (p.goals || 0), 0))}
+              color="text-green-400"
+            />
+            <StatItem
+              label="Total Assists"
+              value={String(players.reduce((s, p) => s + (p.assists || 0), 0))}
+              color="text-blue-400"
+            />
+            <StatItem
+              label="Squad Size"
+              value={String(players.length)}
+              color="text-ahly-gold"
+            />
+            <StatItem
+              label="Avg Age"
+              value={String(Math.round(players.reduce((s, p) => s + p.age, 0) / players.length))}
+              color="text-purple-400"
+            />
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 }

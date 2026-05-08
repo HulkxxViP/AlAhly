@@ -21,7 +21,7 @@ export default function NewsCard({ news, featured = false }: NewsCardProps) {
       href={news.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`glass-card group block overflow-hidden ${
+      className={`glass-card-elevated group block overflow-hidden card-lift ${
         featured ? 'md:col-span-2 md:row-span-2' : ''
       }`}
     >

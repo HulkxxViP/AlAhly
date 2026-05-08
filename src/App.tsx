@@ -7,8 +7,10 @@ import Matches from './pages/Matches';
 import Standings from './pages/Standings';
 import News from './pages/News';
 import Live from './pages/Live';
+import LiveTv from './pages/LiveTv';
 import Squad from './pages/Squad';
 import Settings from './pages/Settings';
+import HistoryPage from './pages/History';
 
 export default function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -21,15 +23,19 @@ export default function App() {
         <Header onMenuClick={() => setSidebarOpen(true)} />
 
         <main className="p-4 md:p-6 lg:p-8">
-          <Routes>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/matches" element={<Matches />} />
-            <Route path="/standings" element={<Standings />} />
-            <Route path="/news" element={<News />} />
-            <Route path="/live" element={<Live />} />
-            <Route path="/squad" element={<Squad />} />
-            <Route path="/settings" element={<Settings />} />
-          </Routes>
+          <div className="page-enter">
+            <Routes>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/matches" element={<Matches />} />
+              <Route path="/standings" element={<Standings />} />
+              <Route path="/history" element={<HistoryPage />} />
+              <Route path="/news" element={<News />} />
+              <Route path="/live" element={<Live />} />
+              <Route path="/live-tv" element={<LiveTv />} />
+              <Route path="/squad" element={<Squad />} />
+              <Route path="/settings" element={<Settings />} />
+            </Routes>
+          </div>
         </main>
 
         <footer className="border-t border-ahly-border p-4 md:p-6">

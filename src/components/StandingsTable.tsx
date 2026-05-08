@@ -31,14 +31,15 @@ export default function StandingsTable({ standings, compact = false }: Standings
           </tr>
         </thead>
         <tbody>
-          {displayStandings.map((row) => (
+          {displayStandings.map((row, idx) => (
             <tr
               key={row.position}
-              className={`border-b border-ahly-border/30 transition-colors ${
+              className={`border-b border-ahly-border/30 transition-all duration-200 ${
                 row.team.isAhly
                   ? 'bg-ahly-red/10 hover:bg-ahly-red/15'
-                  : 'hover:bg-ahly-card'
+                  : 'hover:bg-ahly-card/60'
               }`}
+              style={{ animationDelay: `${idx * 40}ms` }}
             >
               <td className="py-3 px-2">
                 <span
@@ -114,13 +115,15 @@ export default function StandingsTable({ standings, compact = false }: Standings
                   {row.form.map((result, i) => (
                     <span
                       key={i}
-                      className={`w-5 h-5 rounded-sm flex items-center justify-center text-[10px] font-bold text-white ${
+                      className={`w-5 h-5 rounded-sm flex items-center justify-center text-[10px] font-bold text-white
+                        transition-all duration-200 hover:scale-110 ${
                         result === 'W'
                           ? 'bg-green-500'
                           : result === 'D'
                           ? 'bg-yellow-500'
                           : 'bg-red-500'
                       }`}
+                      style={{ animationDelay: `${i * 80}ms` }}
                     >
                       {result}
                     </span>

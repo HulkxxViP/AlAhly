@@ -1,6 +1,6 @@
 import { Match } from '../types';
 import { format, parseISO } from 'date-fns';
-import { MapPin, Clock } from 'lucide-react';
+import { MapPin, Clock, Goal, Activity } from 'lucide-react';
 
 interface MatchCardProps {
   match: Match;
@@ -26,24 +26,27 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
     : match.status === 'finished'
     ? 'border-red-500/30'
     : match.status === 'live'
-    ? 'border-ahly-red animate-pulse-red'
+    ? 'border-ahly-red'
     : 'border-ahly-border';
 
   return (
-    <div className={`glass-card p-4 border ${resultClass} animate-fade-in`}>
+    <div className={`glass-card-elevated p-4 border ${resultClass} card-lift ${match.status === 'live' ? 'glow-ring-red animate-glow' : ''}`}>
       <div className="flex items-center justify-between mb-3">
         <span className={`competition-badge ${match.competition.type}`}>
           {match.competition.name}
         </span>
         {match.status === 'live' ? (
-          <div className="flex items-center gap-1.5">
-            <span className="live-dot" />
+          <div className="flex items-center gap-1.5 bg-red-500/15 px-2 py-0.5 rounded-full">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+            </span>
             <span className="text-xs font-bold text-red-400">
               LIVE {match.minute ? `${match.minute}'` : ''}
             </span>
           </div>
         ) : match.status === 'finished' ? (
-          <span className="text-xs text-ahly-muted">FT</span>
+          <span className="text-xs font-medium text-ahly-muted bg-ahly-dark/50 px-2 py-0.5 rounded">FT</span>
         ) : (
           <span className="text-xs text-ahly-muted">
             {format(parseISO(match.date), 'MMM d, yyyy')}
@@ -70,17 +73,19 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
           ) : (
             <div className="flex items-center gap-2">
               <span
-                className={`text-2xl font-bold ${
-                  isAhlyHome && ahlyWon ? 'text-green-400' : 'text-white'
-                }`}
+                className={`text-2xl font-bold tabular-nums ${
+                  isAhlyHome && ahlyWon ? 'text-green-400' : isAhlyHome && match.status === 'live' ? 'text-ahly-red' : 'text-white'
+                } ${match.status === 'live' ? 'animate-score-flash' : ''}`}
               >
                 {match.homeScore}
               </span>
-              <span className="text-ahly-muted text-lg">-</span>
+              <span className={`text-lg ${match.status === 'live' ? 'text-ahly-red font-bold animate-live-pulse' : 'text-ahly-muted'}`}>
+                {match.status === 'live' ? ':' : '-'}
+              </span>
               <span
-                className={`text-2xl font-bold ${
-                  isAhlyAway && ahlyWon ? 'text-green-400' : 'text-white'
-                }`}
+                className={`text-2xl font-bold tabular-nums ${
+                  isAhlyAway && ahlyWon ? 'text-green-400' : isAhlyAway && match.status === 'live' ? 'text-ahly-red' : 'text-white'
+                } ${match.status === 'live' ? 'animate-score-flash' : ''}`}
               >
                 {match.awayScore}
               </span>
@@ -96,7 +101,16 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
         />
       </div>
 
-      {!compact && match.venue && (
+      {match.status === 'live' && !compact && (
+        <div className="mt-3 pt-3 border-t border-ahly-border/50">
+          <div className="flex items-center gap-2 text-xs text-ahly-muted">
+            <Activity className="w-3 h-3 text-red-400 animate-live-pulse" />
+            <span>Match in progress{match.minute ? ` - ${match.minute}'` : ''}</span>
+          </div>
+        </div>
+      )}
+
+      {!compact && match.venue && match.status !== 'live' && (
         <div className="flex items-center gap-3 mt-3 pt-3 border-t border-ahly-border/50">
           <div className="flex items-center gap-1 text-xs text-ahly-muted">
             <MapPin className="w-3 h-3" />
@@ -112,11 +126,15 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
       )}
 
       {!compact && match.events && match.events.length > 0 && (
-        <div className="mt-3 pt-3 border-t border-ahly-border/50 space-y-1">
+        <div className="mt-3 pt-3 border-t border-ahly-border/50 space-y-1.5">
+          <div className="flex items-center gap-1.5 text-xs text-ahly-muted mb-1.5">
+            <Goal className="w-3 h-3" />
+            <span className="font-medium">Match Events</span>
+          </div>
           {match.events.map((event, i) => (
-            <div key={i} className="flex items-center gap-2 text-xs">
-              <span className="text-ahly-muted w-8">{event.minute}'</span>
-              <span>
+            <div key={i} className="flex items-center gap-2 text-xs animate-slide-right" style={{ animationDelay: `${i * 50}ms` }}>
+              <span className="text-ahly-muted w-8 tabular-nums">{event.minute}'</span>
+              <span className="flex items-center justify-center w-5 h-5 rounded-full bg-ahly-dark/60">
                 {event.type === 'goal' && '⚽'}
                 {event.type === 'yellow' && '🟨'}
                 {event.type === 'red' && '🟥'}
@@ -126,10 +144,10 @@ export default function MatchCard({ match, compact = false }: MatchCardProps) {
                 className={
                   event.team === 'home'
                     ? isAhlyHome
-                      ? 'text-ahly-red'
+                      ? 'text-ahly-red font-medium'
                       : 'text-ahly-text'
                     : isAhlyAway
-                    ? 'text-ahly-red'
+                    ? 'text-ahly-red font-medium'
                     : 'text-ahly-text'
                 }
               >
@@ -160,7 +178,9 @@ function TeamDisplay({
         side === 'away' ? 'items-end' : 'items-start'
       }`}
     >
-      <div className={`w-12 h-12 rounded-full p-1 ${isAhly ? 'ring-2 ring-ahly-red' : ''}`}>
+      <div className={`w-12 h-12 rounded-full p-1 flex items-center justify-center transition-all duration-300 ${
+        isAhly ? 'ring-2 ring-ahly-red glow-ring-red' : 'ring-1 ring-ahly-border'
+      } ${isAhly ? 'animate-float' : ''}`}>
         <img
           src={logo}
           alt={name}

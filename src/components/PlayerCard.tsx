@@ -3,6 +3,7 @@ import { Target, HandHelping, ShirtIcon } from 'lucide-react';
 
 interface PlayerCardProps {
   player: Player;
+  onClick?: () => void;
 }
 
 const positionColors: Record<string, string> = {
@@ -12,25 +13,27 @@ const positionColors: Record<string, string> = {
   Forward: 'bg-ahly-red/20 text-ahly-red border-ahly-red/30',
 };
 
-export default function PlayerCard({ player }: PlayerCardProps) {
+export default function PlayerCard({ player, onClick }: PlayerCardProps) {
   return (
-    <div className="glass-card p-4 group">
+    <div className="glass-card p-4 group cursor-pointer transition-all hover:border-ahly-red/40" onClick={onClick}>
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-full bg-ahly-card border border-ahly-border flex items-center justify-center overflow-hidden">
-            {player.photo ? (
-              <img
-                src={player.photo}
-                alt={player.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
-                  (e.target as HTMLImageElement).parentElement!.innerHTML = `<span class="text-lg font-bold text-ahly-red">${player.number}</span>`;
-                }}
-              />
-            ) : (
-              <span className="text-lg font-bold text-ahly-red">{player.number}</span>
-            )}
+            <img
+              src={player.photo || getAvatarUrl(player.name)}
+              alt={player.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                const img = e.target as HTMLImageElement;
+                if (!img.dataset.fallback) {
+                  img.dataset.fallback = 'true';
+                  img.src = getAvatarUrl(player.name);
+                } else {
+                  img.style.display = 'none';
+                  img.parentElement!.innerHTML = `<span class="text-lg font-bold text-ahly-red">${player.number}</span>`;
+                }
+              }}
+            />
           </div>
           <div>
             <h3 className="text-sm font-semibold text-white group-hover:text-ahly-red transition-colors">
@@ -89,6 +92,10 @@ export default function PlayerCard({ player }: PlayerCardProps) {
       </div>
     </div>
   );
+}
+
+function getAvatarUrl(name: string): string {
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=991b1b&color=fff&size=128&bold=true`;
 }
 
 function getFlagCode(nationality: string): string {

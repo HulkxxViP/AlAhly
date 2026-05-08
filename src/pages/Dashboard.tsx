@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import {
   Trophy,
@@ -8,11 +8,16 @@ import {
   ChevronRight,
   Flame,
   Swords,
+  Bell,
+  BellOff,
+  Zap,
 } from 'lucide-react';
 import MatchCard from '../components/MatchCard';
 import StandingsTable from '../components/StandingsTable';
 import NewsCard from '../components/NewsCard';
 import CountdownTimer from '../components/CountdownTimer';
+import LiveScoreTicker from '../components/LiveScoreTicker';
+import { useNotifications } from '../hooks/useNotifications';
 import { getRecentMatches, getUpcomingMatches, getStandings, getNews, getTeamStats } from '../services/api';
 import { Match, Standing, NewsItem, TeamStats } from '../types';
 
@@ -23,6 +28,10 @@ export default function Dashboard() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [stats, setStats] = useState<TeamStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [notificationsOn, setNotificationsOn] = useState(false);
+  const [animatedStats, setAnimatedStats] = useState(false);
+  const statsRef = useRef<HTMLDivElement>(null);
+  const { requestPermission, notify } = useNotifications();
 
   useEffect(() => {
     async function fetchAll() {
@@ -46,27 +55,74 @@ export default function Dashboard() {
     fetchAll();
   }, []);
 
-  if (loading) return <LoadingState />;
+  useEffect(() => {
+    if (!loading && !animatedStats) {
+      const timer = setTimeout(() => setAnimatedStats(true), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, animatedStats]);
+
+  if (loading) return <DashboardSkeleton />;
 
   const nextMatch = upcoming[0];
   const ahlyStanding = standingsData.find((s) => s.team.isAhly);
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 page-enter">
+      <LiveScoreTicker />
+
+      <div className="flex items-center justify-between">
+        <div className="text-center text-sm text-ahly-muted">
+          Created with ❤️ By Hulk
+        </div>
+        <button
+          onClick={async () => {
+            if (notificationsOn) {
+              setNotificationsOn(false);
+            } else {
+              const granted = await requestPermission();
+              if (granted) {
+                setNotificationsOn(true);
+                notify('Notifications Enabled', { body: 'You will receive match updates.' });
+              }
+            }
+          }}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+            notificationsOn
+              ? 'bg-ahly-red/20 text-ahly-red border border-ahly-red/30'
+              : 'bg-ahly-card text-ahly-muted border border-ahly-border hover:text-white'
+          }`}
+        >
+          {notificationsOn ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
+          {notificationsOn ? 'Notifications On' : 'Enable Alerts'}
+        </button>
+      </div>
+
       {nextMatch && (
         <div className="ahly-gradient rounded-2xl p-6 md:p-8 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 opacity-5">
-            <svg viewBox="0 0 100 100" className="w-full h-full fill-white">
-              <path d="M50 5 L60 35 L95 35 L67 55 L77 85 L50 67 L23 85 L33 55 L5 35 L40 35 Z" />
-            </svg>
+          <div className="absolute inset-0 overflow-hidden">
+            <div className="absolute -top-20 -right-20 w-80 h-80 opacity-[0.06] animate-float-slow">
+              <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
+            </div>
+            <div className="absolute -bottom-10 -left-10 w-48 h-48 opacity-[0.04] animate-float" style={{ animationDelay: '2s' }}>
+              <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
+            </div>
+            <div className="absolute top-1/2 left-1/3 w-32 h-32 opacity-[0.03] animate-float" style={{ animationDelay: '1s' }}>
+              <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
+            </div>
           </div>
 
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-1">
-              <Swords className="w-4 h-4 text-white/70" />
-              <span className="text-sm text-white/70 font-medium">Next Match</span>
+              <div className="flex items-center gap-1.5">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-60" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+                </span>
+                <span className="text-sm text-white/80 font-medium tracking-wide uppercase">Next Match</span>
+              </div>
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-white mb-4">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-3 text-shadow-red">
               {nextMatch.homeTeam.name} vs {nextMatch.awayTeam.name}
             </h2>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-4">
@@ -76,37 +132,46 @@ export default function Dashboard() {
               <span className={`competition-badge ${nextMatch.competition.type}`}>
                 {nextMatch.competition.name}
               </span>
-              <span>{nextMatch.venue}</span>
+              {nextMatch.venue && (
+                <span className="flex items-center gap-1">
+                  <Zap className="w-3 h-3" />
+                  {nextMatch.venue}
+                </span>
+              )}
             </div>
           </div>
         </div>
       )}
 
       {stats && ahlyStanding && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-fade">
           <StatBox
             icon={<Trophy className="w-5 h-5 text-ahly-gold" />}
             label="League Position"
             value={`#${ahlyStanding.position}`}
             sub={`${ahlyStanding.points} pts`}
+            animate={animatedStats}
           />
           <StatBox
             icon={<Flame className="w-5 h-5 text-green-400" />}
             label="Win Rate"
             value={`${Math.round((stats.wins / stats.totalMatches) * 100)}%`}
             sub={`${stats.wins}W ${stats.draws}D ${stats.losses}L`}
+            animate={animatedStats}
           />
           <StatBox
             icon={<Target className="w-5 h-5 text-ahly-red" />}
             label="Top Scorer"
             value={stats.topScorer.name.split(' ').pop()!}
             sub={`${stats.topScorer.goals} goals`}
+            animate={animatedStats}
           />
           <StatBox
             icon={<Shield className="w-5 h-5 text-blue-400" />}
             label="Clean Sheets"
             value={String(stats.cleanSheets)}
             sub={`${stats.goalsConceded} conceded`}
+            animate={animatedStats}
           />
         </div>
       )}
@@ -114,14 +179,14 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
           <SectionHeader title="Recent Results" icon={<Flame />} link="/matches" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 stagger-fade">
             {recentMatches.slice(0, 4).map((match) => (
               <MatchCard key={match.id} match={match} compact />
             ))}
           </div>
 
           <SectionHeader title="Upcoming Fixtures" icon={<Swords />} link="/matches" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 stagger-fade">
             {upcoming.slice(0, 4).map((match) => (
               <MatchCard key={match.id} match={match} compact />
             ))}
@@ -130,7 +195,7 @@ export default function Dashboard() {
 
         <div className="space-y-6">
           <SectionHeader title="League Table" icon={<Trophy />} link="/standings" />
-          <div className="glass-card p-3">
+          <div className="glass-card-elevated p-3">
             <StandingsTable standings={standingsData} compact />
           </div>
         </div>
@@ -138,7 +203,7 @@ export default function Dashboard() {
 
       <div>
         <SectionHeader title="Latest News" icon={<TrendingUp />} link="/news" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 stagger-fade">
           {news.slice(0, 3).map((item, i) => (
             <NewsCard key={item.id} news={item} featured={i === 0} />
           ))}
@@ -153,17 +218,51 @@ function StatBox({
   label,
   value,
   sub,
+  animate,
 }: {
   icon: React.ReactNode;
   label: string;
   value: string;
   sub: string;
+  animate?: boolean;
 }) {
+  const [displayValue, setDisplayValue] = useState(animate ? value : '0');
+  const prevValue = useRef('0');
+
+  useEffect(() => {
+    if (!animate) return;
+    const numVal = parseInt(value.replace(/[^0-9]/g, ''));
+    const prevNum = parseInt(prevValue.current.replace(/[^0-9]/g, '')) || 0;
+    if (numVal === prevNum || isNaN(numVal)) {
+      setDisplayValue(value);
+      return;
+    }
+    const steps = 20;
+    let step = 0;
+    const prefix = value.replace(/[0-9]/g, '');
+    const suffix = value.replace(/^[0-9]+/, '');
+    const cleanNum = parseInt(value.replace(/[^0-9]/g, ''));
+    if (isNaN(cleanNum)) { setDisplayValue(value); return; }
+
+    const interval = setInterval(() => {
+      step++;
+      const current = Math.round((cleanNum / steps) * step);
+      if (step >= steps) {
+        setDisplayValue(value);
+        clearInterval(interval);
+      } else {
+        setDisplayValue(`${prefix}${current}${suffix}`);
+      }
+    }, 40);
+
+    return () => clearInterval(interval);
+  }, [animate, value]);
+
   return (
-    <div className="stat-card">
+    <div className="stat-card animate-scale-in">
       <div className="mb-2">{icon}</div>
       <p className="text-xs text-ahly-muted mb-1">{label}</p>
-      <p className="text-xl font-bold text-white">{value}</p>
+      <p className="text-xl font-bold text-white">{displayValue}</p>
       <p className="text-xs text-ahly-muted mt-0.5">{sub}</p>
     </div>
   );
@@ -194,12 +293,39 @@ function SectionHeader({
   );
 }
 
-function LoadingState() {
+function DashboardSkeleton() {
   return (
-    <div className="flex items-center justify-center min-h-[60vh]">
-      <div className="flex flex-col items-center gap-4">
-        <div className="w-16 h-16 border-4 border-ahly-red/30 border-t-ahly-red rounded-full animate-spin" />
-        <p className="text-ahly-muted text-sm">Loading Al-Ahly data...</p>
+    <div className="space-y-6 page-enter">
+      <div className="skeleton h-12 w-full" />
+      <div className="flex justify-between">
+        <div className="skeleton h-5 w-48" />
+        <div className="skeleton h-8 w-32 rounded-lg" />
+      </div>
+      <div className="skeleton h-64 w-full rounded-2xl" />
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="skeleton h-32 rounded-xl" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="lg:col-span-2 space-y-6">
+          <div className="skeleton h-6 w-40" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="skeleton h-32 rounded-xl" />
+            ))}
+          </div>
+          <div className="skeleton h-6 w-44" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="skeleton h-32 rounded-xl" />
+            ))}
+          </div>
+        </div>
+        <div className="space-y-6">
+          <div className="skeleton h-6 w-32" />
+          <div className="skeleton h-80 rounded-xl" />
+        </div>
       </div>
     </div>
   );

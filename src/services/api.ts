@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Match, Standing, NewsItem } from '../types';
+import { Match, Standing, NewsItem, StreamSource, LeagueMatch } from '../types';
 import {
   recentMatches,
   upcomingMatches,
@@ -7,6 +7,9 @@ import {
   mockNews,
   squad,
   teamStats,
+  streamSources,
+  historicalMatches,
+  otherLeagueMatches,
 } from '../data/mockData';
 
 const API_KEY = import.meta.env.VITE_API_FOOTBALL_KEY;
@@ -24,6 +27,7 @@ const apiClient = axios.create({
 const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_DURATION = 10 * 60 * 1000;
 const LIVE_CACHE_DURATION = 30 * 1000;
+const SQUAD_CACHE_KEY = 'ahly_squad_cache';
 
 async function cachedRequest<T>(key: string, fetcher: () => Promise<T>, ttl = CACHE_DURATION): Promise<T> {
   const cached = cache.get(key);
@@ -40,8 +44,7 @@ function isLiveMode(): boolean {
 }
 
 function getSeasonForApi(): number {
-  // Free plan only supports 2022-2024 seasons
-  return 2024;
+  return 2025;
 }
 
 function formatDate(date: Date): string {
@@ -159,60 +162,113 @@ export async function getLiveMatch(): Promise<Match | null> {
   }, LIVE_CACHE_DURATION);
 }
 
-export async function getNews(): Promise<NewsItem[]> {
-  try {
-    const response = await axios.get(
-      'https://api.rss2json.com/v1/api.json', {
-        params: {
-          rss_url: 'https://news.google.com/rss/search?q=Al+Ahly+Egypt+football&hl=en&gl=EG&ceid=EG:en',
-          count: 12,
-        },
-      }
-    );
+const NEWS_CACHE_KEY = 'ahly_news_cache';
 
-    if (response.data?.items?.length > 0) {
-      return response.data.items.map((item: Record<string, string>, index: number) => ({
-        id: `rss-${index}`,
-        title: item.title,
-        description: item.description?.replace(/<[^>]*>/g, '').slice(0, 200) || '',
-        url: item.link,
-        imageUrl: item.enclosure || item.thumbnail || mockNews[index % mockNews.length]?.imageUrl,
-        source: item.author || 'Google News',
-        publishedAt: item.pubDate,
-        category: 'general' as const,
-      }));
+export async function getNews(): Promise<NewsItem[]> {
+  const rssUrls = [
+    'https://news.google.com/rss/search?q=Al+Ahly+Egypt+football&hl=en&gl=EG&ceid=EG:en',
+    'https://news.google.com/rss/search?q=Al+Ahly+SC+news&hl=en&gl=EG&ceid=EG:en',
+  ];
+
+  for (const rssUrl of rssUrls) {
+    try {
+      const response = await axios.get('https://api.rss2json.com/v1/api.json', {
+        params: { rss_url: rssUrl, count: 15 },
+        timeout: 8000,
+      });
+
+      if (response.data?.items?.length > 0) {
+        const items = response.data.items.map((item: Record<string, unknown>, index: number) => ({
+          id: `rss-${rssUrls.indexOf(rssUrl)}-${index}`,
+          title: (item.title as string) || '',
+          description: ((item.description as string) || '').replace(/<[^>]*>/g, '').slice(0, 200),
+          url: (item.link as string) || '',
+          imageUrl: extractRssImage(item) || mockNews[index % mockNews.length]?.imageUrl || '',
+          source: (item.author as string) || 'Google News',
+          publishedAt: (item.pubDate as string) || new Date().toISOString(),
+          category: 'general' as const,
+        }));
+        const valid = items.filter((n: { title: string }) => n.title);
+        if (valid.length > 0) {
+          localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify({ data: valid, timestamp: Date.now() }));
+          return valid;
+        }
+      }
+    } catch {
+      continue;
     }
-    return mockNews;
-  } catch {
-    return mockNews;
   }
+
+  try {
+    const cached = localStorage.getItem(NEWS_CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed.data) && parsed.data.length > 0) return parsed.data;
+    }
+  } catch {}
+
+  return mockNews;
+}
+
+function extractRssImage(item: Record<string, unknown>): string | undefined {
+  const enclosure = item.enclosure;
+  if (enclosure) {
+    if (typeof enclosure === 'string') return enclosure;
+    if (enclosure && typeof enclosure === 'object') {
+      const enc = enclosure as Record<string, unknown>;
+      if (typeof enc.url === 'string') return enc.url;
+    }
+  }
+  const thumb = item.thumbnail;
+  if (thumb) {
+    if (typeof thumb === 'string') return thumb;
+    if (thumb && typeof thumb === 'object') {
+      const t = thumb as Record<string, unknown>;
+      if (typeof t.url === 'string') return t.url;
+    }
+  }
+  const desc = item.description as string | undefined;
+  if (desc) {
+    const match = desc.match(/<img[^>]+src=["']([^"']+)["']/);
+    if (match) return match[1];
+  }
+  return undefined;
 }
 
 export async function getSquad() {
-  if (!isLiveMode()) return squad;
-
-  return cachedRequest('squad', async () => {
-    try {
+  try {
+    if (API_KEY && API_KEY !== 'your_api_key_here') {
       const { data } = await apiClient.get('/players/squads', {
         params: { team: AHLY_TEAM_ID },
       });
       const players = data.response?.[0]?.players || [];
       if (players.length > 0) {
-        return players.map((p: Record<string, unknown>, i: number) => ({
-          id: p.id || i,
-          name: p.name,
-          position: p.position,
-          number: p.number || i + 1,
-          nationality: '',
-          age: 0,
-          photo: p.photo,
+        const mapped = players.map((p: Record<string, unknown>, i: number) => ({
+          id: (p.id as number) || i,
+          name: (p.name as string) || '',
+          position: (p.position as string) || '',
+          number: (p.number as number) || i + 1,
+          nationality: (p.nationality as string) || '',
+          age: (p.age as number) || 0,
+          photo: p.photo as string | undefined,
         }));
+        localStorage.setItem(SQUAD_CACHE_KEY, JSON.stringify({ data: mapped, timestamp: Date.now() }));
+        return mapped;
       }
-      return squad;
-    } catch {
-      return squad;
     }
-  });
+  } catch {
+    // API call failed, fall through to cache
+  }
+
+  try {
+    const cached = localStorage.getItem(SQUAD_CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed.data) && parsed.data.length > 0) return parsed.data;
+    }
+  } catch {}
+
+  return squad;
 }
 
 export async function getTeamStats() {
@@ -277,6 +333,33 @@ function mapApiFixtures(fixtures: Record<string, unknown>[]): Match[] {
       minute: (fixture.status as Record<string, unknown>)?.elapsed as number | undefined,
     };
   });
+}
+
+const CUSTOM_STREAMS_KEY = 'ahly_custom_streams';
+
+export function getCustomStreams(): StreamSource[] {
+  try {
+    const raw = localStorage.getItem(CUSTOM_STREAMS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCustomStreams(streams: StreamSource[]): void {
+  localStorage.setItem(CUSTOM_STREAMS_KEY, JSON.stringify(streams));
+}
+
+export function getAllStreams(): StreamSource[] {
+  return [...streamSources, ...getCustomStreams()];
+}
+
+export async function getHistory(): Promise<Match[]> {
+  return historicalMatches;
+}
+
+export async function getOtherLeagueMatches(): Promise<LeagueMatch[]> {
+  return otherLeagueMatches;
 }
 
 function mapApiStandings(apiStandings: Record<string, unknown>[]): Standing[] {

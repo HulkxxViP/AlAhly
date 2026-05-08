@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Newspaper, RefreshCw } from 'lucide-react';
 import NewsCard from '../components/NewsCard';
 import { getNews } from '../services/api';
@@ -11,16 +11,23 @@ export default function News() {
   const [filter, setFilter] = useState<Category>('all');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState<string | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   async function fetchNews() {
     const data = await getNews();
     setNews(data);
     setLoading(false);
     setRefreshing(false);
+    setLastUpdated(new Date().toLocaleTimeString());
   }
 
   useEffect(() => {
     fetchNews();
+    intervalRef.current = setInterval(fetchNews, 5 * 60 * 1000);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, []);
 
   const filtered =
@@ -36,26 +43,30 @@ export default function News() {
   ];
 
   return (
-    <div className="animate-fade-in">
+    <div className="page-enter">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Newspaper className="w-7 h-7 text-ahly-red" />
           <h1 className="page-header mb-0">Latest News</h1>
         </div>
-        <button
-          onClick={() => {
-            setRefreshing(true);
-            fetchNews();
-          }}
-          className={`flex items-center gap-2 px-3 py-2 rounded-lg bg-ahly-card text-ahly-muted
-            hover:text-white border border-ahly-border transition-all text-sm ${
-              refreshing ? 'animate-spin' : ''
-            }`}
-          disabled={refreshing}
-        >
-          <RefreshCw className="w-4 h-4" />
-          Refresh
-        </button>
+        <div className="flex items-center gap-3">
+          {lastUpdated && (
+            <span className="text-xs text-ahly-muted hidden sm:block">
+              Updated {lastUpdated}
+            </span>
+          )}
+          <button
+            onClick={() => {
+              setRefreshing(true);
+              fetchNews();
+            }}
+            className="flex items-center gap-2 px-3 py-2 rounded-lg bg-ahly-card text-ahly-muted hover:text-white border border-ahly-border transition-all text-sm disabled:opacity-60"
+            disabled={refreshing}
+          >
+            <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-2 mb-6 overflow-x-auto pb-2">
@@ -75,15 +86,17 @@ export default function News() {
       </div>
 
       {loading ? (
-        <div className="flex justify-center py-20">
-          <div className="w-12 h-12 border-4 border-ahly-red/30 border-t-ahly-red rounded-full animate-spin" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="skeleton h-72 rounded-xl" />
+          ))}
         </div>
       ) : filtered.length === 0 ? (
         <div className="text-center py-20">
           <p className="text-ahly-muted">No news in this category.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 stagger-fade">
           {filtered.map((item, i) => (
             <NewsCard key={item.id} news={item} featured={i === 0} />
           ))}

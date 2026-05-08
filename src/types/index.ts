@@ -95,3 +95,27 @@ export interface TeamStats {
   topScorer: { name: string; goals: number };
   topAssister: { name: string; assists: number };
 }
+
+export interface LeagueMatch {
+  id: number;
+  homeTeam: string;
+  awayTeam: string;
+  homeScore: number | null;
+  awayScore: number | null;
+  status: 'live' | 'finished' | 'upcoming';
+  minute?: number;
+  competition: string;
+}
+
+export interface TVChannel {
+  id: string;
+  name: string;
+  nameAr?: string;
+  logo?: string;
+  streamUrl?: string;
+  embedUrl?: string;
+  website?: string;
+  category: 'egyptian_sports' | 'regional' | 'international' | 'free_streaming';
+  isOnline?: boolean;
+  lastChecked?: string;
+}

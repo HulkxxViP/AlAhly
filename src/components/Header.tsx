@@ -19,7 +19,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </button>
 
           <div className="lg:hidden flex items-center gap-2">
-            <img src={`${basePath}ahly-logo.svg`} alt="Al Ahly" className="w-8 h-8" />
+            <img src={`${basePath}ahly-logo.png`} alt="Al Ahly" className="w-8 h-8" />
             <span className="text-sm font-bold text-white">Al Ahly Tracker</span>
           </div>
 
@@ -40,7 +40,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </button>
 
           <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-ahly-red/50">
-            <img src={`${basePath}ahly-logo.svg`} alt="Al Ahly" className="w-full h-full" />
+            <img src={`${basePath}ahly-logo.png`} alt="Al Ahly" className="w-full h-full" />
           </div>
         </div>
       </div>

@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import {
   Tv,
   Radio,
@@ -12,31 +12,49 @@ import {
   Maximize2,
   Minimize2,
   ExternalLink,
+  RefreshCw,
+  RotateCcw,
 } from 'lucide-react';
 import MatchCard from '../components/MatchCard';
-import { getLiveMatch, getUpcomingMatches } from '../services/api';
-import { streamSources } from '../data/mockData';
+import { getLiveMatch, getUpcomingMatches, getAllStreams } from '../services/api';
 import { Match, StreamSource } from '../types';
 
 export default function Live() {
   const [liveMatch, setLiveMatch] = useState<Match | null>(null);
   const [nextMatch, setNextMatch] = useState<Match | null>(null);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const [autoRefresh, setAutoRefresh] = useState(true);
   const [selectedStream, setSelectedStream] = useState<StreamSource | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const playerRef = useRef<HTMLDivElement>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  const fetchData = useCallback(async () => {
+    const [live, upcoming] = await Promise.all([getLiveMatch(), getUpcomingMatches()]);
+    setLiveMatch(live);
+    setNextMatch(upcoming?.[0] || null);
+    setLoading(false);
+    setRefreshing(false);
+  }, []);
 
   useEffect(() => {
-    async function fetchData() {
-      const [live, upcoming] = await Promise.all([getLiveMatch(), getUpcomingMatches()]);
-      setLiveMatch(live);
-      setNextMatch(upcoming?.[0] || null);
-      setLoading(false);
-    }
     fetchData();
-    const interval = setInterval(fetchData, 30000);
-    return () => clearInterval(interval);
-  }, []);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [fetchData]);
+
+  useEffect(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    if (autoRefresh) {
+      intervalRef.current = setInterval(fetchData, 30000);
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [autoRefresh, fetchData]);
+
+  function handleManualRefresh() {
+    setRefreshing(true);
+    fetchData();
+  }
 
   useEffect(() => {
     function onFullscreenChange() {
@@ -64,54 +82,97 @@ export default function Live() {
     if (stream.embedUrl) {
       setSelectedStream(stream);
     } else {
-      setSelectedStream(stream);
+      window.open(stream.url, '_blank', 'noopener,noreferrer');
     }
   }
 
-  const officialStreams = streamSources.filter((s) => s.type === 'official');
-  const freeStreams = streamSources.filter((s) => s.type === 'free');
-  const premiumStreams = streamSources.filter((s) => s.type === 'premium');
+  const allStreams = getAllStreams();
+  const officialStreams = allStreams.filter((s) => s.type === 'official');
+  const freeStreams = allStreams.filter((s) => s.type === 'free');
+  const premiumStreams = allStreams.filter((s) => s.type === 'premium');
 
   if (loading) {
     return (
-      <div className="flex justify-center py-20">
-        <div className="w-12 h-12 border-4 border-ahly-red/30 border-t-ahly-red rounded-full animate-spin" />
+      <div className="page-enter">
+        <div className="flex items-center justify-between mb-6">
+          <div className="flex items-center gap-3">
+            <Tv className="w-7 h-7 text-ahly-red" />
+            <h1 className="page-header mb-0">Live & Streaming</h1>
+          </div>
+        </div>
+        <div className="skeleton h-48 w-full rounded-2xl mb-6" />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="skeleton h-64 rounded-xl" />
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="animate-fade-in">
-      <div className="flex items-center gap-3 mb-6">
-        <Tv className="w-7 h-7 text-ahly-red" />
-        <h1 className="page-header mb-0">Live & Streaming</h1>
+    <div className="page-enter">
+      <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center gap-3">
+          <Tv className="w-7 h-7 text-ahly-red" />
+          <h1 className="page-header mb-0">Live & Streaming</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setAutoRefresh(!autoRefresh)}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+              autoRefresh
+                ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                : 'bg-ahly-card text-ahly-muted border border-ahly-border'
+            }`}
+          >
+            <RotateCcw className="w-3.5 h-3.5" />
+            Auto
+          </button>
+          <button
+            onClick={handleManualRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ahly-card text-ahly-muted hover:text-white border border-ahly-border transition-all text-xs font-medium disabled:opacity-50"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {liveMatch ? (
         <div className="mb-6">
           <div className="flex items-center gap-2 mb-4">
-            <span className="live-dot" />
-            <h2 className="text-lg font-bold text-red-400">Match In Progress</h2>
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
+            </span>
+            <h2 className="text-lg font-bold text-red-400 animate-glow-red">Match In Progress</h2>
           </div>
           <div className="max-w-xl">
             <MatchCard match={liveMatch} />
           </div>
         </div>
       ) : nextMatch ? (
-        <div className="ahly-gradient-subtle border border-ahly-red/20 rounded-2xl p-6 mb-6">
-          <div className="flex items-center gap-2 mb-2">
-            <Clock className="w-5 h-5 text-ahly-muted" />
-            <span className="text-sm text-ahly-muted">No Live Match Right Now</span>
+        <div className="ahly-gradient-subtle border border-ahly-red/20 rounded-2xl p-6 mb-6 relative overflow-hidden">
+          <div className="absolute -top-10 -right-10 w-32 h-32 opacity-[0.04]">
+            <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
           </div>
-          <h2 className="text-lg font-semibold text-white mb-4">
-            Next match: {nextMatch.homeTeam.name} vs {nextMatch.awayTeam.name}
-          </h2>
-          <div className="max-w-xl">
-            <MatchCard match={nextMatch} compact />
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-2">
+              <Clock className="w-5 h-5 text-ahly-muted" />
+              <span className="text-sm text-ahly-muted">No Live Match Right Now</span>
+            </div>
+            <h2 className="text-lg font-semibold text-white mb-4">
+              Next match: {nextMatch.homeTeam.name} vs {nextMatch.awayTeam.name}
+            </h2>
+            <div className="max-w-xl">
+              <MatchCard match={nextMatch} compact />
+            </div>
           </div>
         </div>
       ) : (
-        <div className="glass-card p-8 text-center mb-6">
+        <div className="glass-card-elevated p-8 text-center mb-6">
           <WifiOff className="w-12 h-12 text-ahly-muted mx-auto mb-3" />
           <h2 className="text-lg font-semibold text-white mb-1">No Upcoming Matches</h2>
           <p className="text-sm text-ahly-muted">Check back later for live match updates.</p>
@@ -121,14 +182,17 @@ export default function Live() {
       {selectedStream && (
         <div
           ref={playerRef}
-          className={`glass-card mb-6 border-ahly-red/30 overflow-hidden ${
+          className={`glass-card-elevated mb-6 border-ahly-red/30 overflow-hidden ${
             isFullscreen ? 'fixed inset-0 z-[100] rounded-none border-none' : ''
           }`}
         >
           <div className="flex items-center justify-between px-4 py-3 bg-ahly-dark/90 border-b border-ahly-border">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-1.5">
-                <span className="live-dot" />
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+                </span>
                 <Play className="w-4 h-4 text-ahly-red" />
               </div>
               <span className="text-sm font-semibold text-white">{selectedStream.name}</span>
@@ -179,7 +243,7 @@ export default function Live() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-fade">
         <StreamSection
           title="Official Channels"
           icon={<Star className="w-4 h-4 text-ahly-gold" />}
@@ -209,7 +273,7 @@ export default function Live() {
         />
       </div>
 
-      <div className="mt-8 glass-card p-5">
+      <div className="mt-8 glass-card-elevated p-5">
         <div className="flex items-center gap-2 mb-3">
           <Radio className="w-4 h-4 text-ahly-red" />
           <h3 className="text-sm font-semibold text-white">How to Watch Al Ahly Matches</h3>
@@ -257,7 +321,7 @@ function StreamSection({
   badgeClass: string;
 }) {
   return (
-    <div className="glass-card p-5">
+    <div className="glass-card-elevated p-5">
       <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
         {icon}
         {title}
