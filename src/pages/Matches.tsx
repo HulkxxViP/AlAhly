@@ -1,15 +1,14 @@
-import { useState, useEffect } from 'react';
-import { Calendar, ArrowLeft, ArrowRight } from 'lucide-react';
+import { useState, useEffect, useMemo } from 'react';
+import { Calendar, ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
 import MatchCard from '../components/MatchCard';
 import { getRecentMatches, getUpcomingMatches } from '../services/api';
-import { Match } from '../types';
+import { Match, Competition } from '../types';
 
 type Tab = 'results' | 'upcoming';
-type CompFilter = 'all' | 'league' | 'continental' | 'cup';
 
 export default function Matches() {
   const [tab, setTab] = useState<Tab>('results');
-  const [filter, setFilter] = useState<CompFilter>('all');
+  const [compFilter, setCompFilter] = useState<number | 'all'>('all');
   const [recent, setRecent] = useState<Match[]>([]);
   const [upcoming, setUpcoming] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,11 +23,22 @@ export default function Matches() {
     fetchData();
   }, []);
 
+  const competitions = useMemo(() => {
+    const all = [...recent, ...upcoming];
+    const map = new Map<number, Competition>();
+    for (const m of all) {
+      if (!map.has(m.competition.id)) {
+        map.set(m.competition.id, m.competition);
+      }
+    }
+    return Array.from(map.values());
+  }, [recent, upcoming]);
+
   const currentMatches = tab === 'results' ? recent : upcoming;
   const filtered =
-    filter === 'all'
+    compFilter === 'all'
       ? currentMatches
-      : currentMatches.filter((m) => m.competition.type === filter);
+      : currentMatches.filter((m) => m.competition.id === compFilter);
 
   return (
     <div className="page-enter">
@@ -55,20 +65,20 @@ export default function Matches() {
               </TabButton>
             </div>
 
-            <div className="flex gap-2">
-              {(['all', 'league', 'continental', 'cup'] as CompFilter[]).map((f) => (
-                <button
-                  key={f}
-                  onClick={() => setFilter(f)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    filter === f
-                      ? 'bg-ahly-red text-white'
-                      : 'bg-ahly-card text-ahly-muted hover:text-white border border-ahly-border'
-                  }`}
-                >
-                  {f === 'all' ? 'All' : f.charAt(0).toUpperCase() + f.slice(1)}
-                </button>
-              ))}
+            <div className="relative">
+              <select
+                value={compFilter === 'all' ? 'all' : String(compFilter)}
+                onChange={(e) => setCompFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
+                className="appearance-none bg-ahly-card text-sm text-white border border-ahly-border rounded-lg px-4 py-2 pr-10 focus:outline-none focus:border-ahly-red cursor-pointer"
+              >
+                <option value="all">All Competitions</option>
+                {competitions.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="w-4 h-4 text-ahly-muted absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             </div>
           </div>
 
