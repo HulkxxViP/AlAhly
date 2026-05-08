@@ -164,36 +164,105 @@ export async function getLiveMatch(): Promise<Match | null> {
 
 const NEWS_CACHE_KEY = 'ahly_news_cache';
 
-export async function getNews(): Promise<NewsItem[]> {
-  const rssUrls = [
-    'https://news.google.com/rss/search?q=Al+Ahly+Egypt+football&hl=en&gl=EG&ceid=EG:en',
-    'https://news.google.com/rss/search?q=Al+Ahly+SC+news&hl=en&gl=EG&ceid=EG:en',
-  ];
+interface RssFeed {
+  url: string;
+  name: string;
+}
 
-  for (const rssUrl of rssUrls) {
+const RSS_FEEDS: RssFeed[] = [
+  { url: 'https://www.kingfut.com/feed/', name: 'KingFut' },
+  { url: 'https://www.filgoal.com/articles/rss', name: 'FilGoal' },
+  { url: 'https://news.google.com/rss/search?q=Al+Ahly+Egypt+football+news&hl=en&gl=EG&ceid=EG:en', name: 'Google News' },
+  { url: 'https://news.google.com/rss/search?q=%D8%A7%D9%84%D8%A3%D9%87%D9%84%D9%8A+%D9%86%D8%AA%D8%A7%D8%A6%D8%AC+%D9%85%D8%A8%D8%A7%D8%B1%D9%8A%D8%A7%D8%AA&hl=ar&gl=EG&ceid=EG:ar', name: 'أخبار الأهلي' },
+  { url: 'https://www.goal.com/feeds/en/feeds/egypt/feed.rss', name: 'Goal Egypt' },
+  { url: 'https://www.cafonline.com/rss/all-news/', name: 'CAF Online' },
+];
+
+const AHLY_KEYWORDS = [
+  'al ahly', 'alahly', 'al-ahly', 'el ahly', 'ahly sc',
+  'الأهلي', 'النادي الأهلي', 'القلعة الحمراء', 'نادى الأهلى',
+  'red devils', 'الاهلي', 'اهلى',
+];
+
+function isAboutAlAhly(text: string): boolean {
+  const lower = text.toLowerCase();
+  return AHLY_KEYWORDS.some((k) => lower.includes(k));
+}
+
+function autoCategorize(title: string, description: string): NewsItem['category'] {
+  const text = (title + ' ' + description).toLowerCase();
+  if (/\b(goal|win|defeat|beat|victory|draw|lose|lost|match|score|result|فوز|خسارة|تعادل|هدف|مباراة)\b/.test(text)) return 'match';
+  if (/\b(transfer|sign|signing|contract|deal|join|moves|sold|buy|انتقال|تعاقد|شراء|بيع|صفقة)\b/.test(text)) return 'transfer';
+  if (/\b(injury|injured|torn|hamstring|knee|surgery|sidelined|fitness|return|إصابة|مصاب|جراحة|شفاء)\b/.test(text)) return 'injury';
+  if (/\b(award|player of the month|best|awarded|honour|trophy|champion|جائزة|جايزة|بطولة|كأس|تتويج)\b/.test(text)) return 'award';
+  return 'general';
+}
+
+function tryExtractImage(item: Record<string, unknown>): string | undefined {
+  const enclosure = item.enclosure;
+  if (enclosure) {
+    if (typeof enclosure === 'string') return enclosure;
+    if (enclosure && typeof enclosure === 'object') {
+      const enc = enclosure as Record<string, unknown>;
+      if (typeof enc.url === 'string') return enc.url;
+      if (typeof enc.link === 'string') return enc.link;
+    }
+  }
+  const thumb = item.thumbnail || item['media:thumbnail'] || (item as any)['media_content'];
+  if (thumb) {
+    if (typeof thumb === 'string') return thumb;
+    if (thumb && typeof thumb === 'object') {
+      const t = thumb as Record<string, unknown>;
+      if (typeof t.url === 'string') return t.url;
+    }
+  }
+  const desc = item.description as string | undefined;
+  if (desc) {
+    const match = desc.match(/<img[^>]+src=["']([^"']+)["']/);
+    if (match && !match[1].includes('google.com')) return match[1].split('?')[0];
+  }
+  return undefined;
+}
+
+function stripHtml(text: string): string {
+  return text.replace(/<[^>]*>/g, '').trim();
+}
+
+function mapRssItem(item: Record<string, unknown>, feedIndex: number, feedName: string): NewsItem | null {
+  const title = (item.title as string)?.trim();
+  if (!title) return null;
+  const description = stripHtml((item.description as string) || '');
+  return {
+    id: `news-${feedIndex}-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+    title: title,
+    description: description.slice(0, 250),
+    url: (item.link as string) || '',
+    imageUrl: tryExtractImage(item) || undefined,
+    source: (item.author as string) || feedName,
+    publishedAt: (item.pubDate as string) || new Date().toISOString(),
+    category: autoCategorize(title, description),
+  };
+}
+
+export async function getNews(): Promise<NewsItem[]> {
+  for (let i = 0; i < RSS_FEEDS.length; i++) {
+    const feed = RSS_FEEDS[i];
     try {
       const response = await axios.get('https://api.rss2json.com/v1/api.json', {
-        params: { rss_url: rssUrl, count: 15 },
+        params: { rss_url: feed.url, count: 15 },
         timeout: 8000,
       });
+      const items: Record<string, unknown>[] = response.data?.items || [];
+      if (items.length === 0) continue;
 
-      if (response.data?.items?.length > 0) {
-        const items = response.data.items.map((item: Record<string, unknown>, index: number) => ({
-          id: `rss-${rssUrls.indexOf(rssUrl)}-${index}`,
-          title: (item.title as string) || '',
-          description: ((item.description as string) || '').replace(/<[^>]*>/g, '').slice(0, 200),
-          url: (item.link as string) || '',
-          imageUrl: extractRssImage(item) || mockNews[index % mockNews.length]?.imageUrl || '',
-          source: (item.author as string) || 'Google News',
-          publishedAt: (item.pubDate as string) || new Date().toISOString(),
-          category: 'general' as const,
-        }));
-        const valid = items.filter((n: { title: string }) => n.title);
-        if (valid.length > 0) {
-          localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify({ data: valid, timestamp: Date.now() }));
-          return valid;
-        }
-      }
+      const mapped = items.map((item) => mapRssItem(item, i, feed.name)).filter(Boolean) as NewsItem[];
+      if (mapped.length === 0) continue;
+
+      const ahlyNews = mapped.filter((n) => isAboutAlAhly(n.title + ' ' + n.description));
+      const result = ahlyNews.length >= 3 ? ahlyNews : mapped;
+
+      localStorage.setItem(NEWS_CACHE_KEY, JSON.stringify({ data: result, timestamp: Date.now() }));
+      return result.slice(0, 24);
     } catch {
       continue;
     }
@@ -208,31 +277,6 @@ export async function getNews(): Promise<NewsItem[]> {
   } catch {}
 
   return mockNews;
-}
-
-function extractRssImage(item: Record<string, unknown>): string | undefined {
-  const enclosure = item.enclosure;
-  if (enclosure) {
-    if (typeof enclosure === 'string') return enclosure;
-    if (enclosure && typeof enclosure === 'object') {
-      const enc = enclosure as Record<string, unknown>;
-      if (typeof enc.url === 'string') return enc.url;
-    }
-  }
-  const thumb = item.thumbnail;
-  if (thumb) {
-    if (typeof thumb === 'string') return thumb;
-    if (thumb && typeof thumb === 'object') {
-      const t = thumb as Record<string, unknown>;
-      if (typeof t.url === 'string') return t.url;
-    }
-  }
-  const desc = item.description as string | undefined;
-  if (desc) {
-    const match = desc.match(/<img[^>]+src=["']([^"']+)["']/);
-    if (match) return match[1];
-  }
-  return undefined;
 }
 
 export async function getSquad() {
