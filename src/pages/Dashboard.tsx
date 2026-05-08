@@ -41,6 +41,7 @@ export default function Dashboard() {
   const livePollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { requestPermission, notify } = useNotifications();
   const { addToast } = useToast();
+  const [dashboardEventIndex, setDashboardEventIndex] = useState(0);
 
   useEffect(() => {
     async function fetchAll() {
@@ -83,6 +84,16 @@ export default function Dashboard() {
       return () => clearTimeout(timer);
     }
   }, [loading, animatedStats]);
+
+  useEffect(() => {
+    if (!liveMatch?.events || liveMatch.events.length <= 1) return;
+    const tick = setInterval(() => {
+      setDashboardEventIndex((prev) =>
+        prev >= (liveMatch.events?.length ?? 1) - 1 ? 0 : prev + 1
+      );
+    }, 4000);
+    return () => clearInterval(tick);
+  }, [liveMatch?.events?.length]);
 
   const notifiedEvents = useRef<Set<string>>(new Set());
 
@@ -134,6 +145,10 @@ export default function Dashboard() {
           {notificationsOn ? 'Notifications On' : 'Enable Alerts'}
         </button>
       </div>
+
+      {liveMatch && liveMatch.status === 'live' && (
+        <DashboardLiveBar match={liveMatch} eventIndex={dashboardEventIndex} />
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {nextMatch && (
@@ -380,6 +395,57 @@ function NextMatchHero({ match: nextMatch }: { match: Match }) {
             </span>
           )}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function DashboardLiveBar({ match, eventIndex: _ei }: { match: Match; eventIndex: number }) {
+  const isAhlyHome = match.homeTeam.isAhly;
+  const ahlyScore = isAhlyHome ? match.homeScore : match.awayScore;
+  const oppScore = isAhlyHome ? match.awayScore : match.homeScore;
+  const oppTeam = isAhlyHome ? match.awayTeam.name : match.homeTeam.name;
+  const events = match.events || [];
+  const event = events[_ei];
+
+  return (
+    <div className="bg-gradient-to-r from-ahly-dark via-ahly-card to-ahly-dark border border-ahly-border/30 rounded-xl px-4 md:px-6">
+      <div className="flex items-center gap-2 md:gap-4 py-2 text-[11px] overflow-hidden">
+        <Link to="/live" className="flex items-center gap-1.5 shrink-0 group">
+          <span className="relative flex h-2 w-2">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
+            <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
+          </span>
+          <span className="text-xs font-bold text-red-400 tracking-wide">LIVE</span>
+        </Link>
+
+        <span className="text-ahly-text font-semibold truncate max-w-[80px]">Al Ahly</span>
+        <span className="font-bold text-white tabular-nums bg-ahly-dark/60 px-1.5 py-0.5 rounded">
+          {ahlyScore ?? '-'}:{oppScore ?? '-'}
+        </span>
+        <span className="text-ahly-muted truncate max-w-[80px] hidden sm:inline">{oppTeam}</span>
+        {match.minute && (
+          <span className="text-red-400 font-bold text-[10px]">{match.minute}&apos;</span>
+        )}
+
+        <div className="hidden md:flex items-center gap-1.5 text-ahly-muted flex-1 min-w-0 border-l border-ahly-border/20 pl-2">
+          {event ? (
+            <span className="animate-slide-right truncate flex items-center gap-1" key={`${event.minute}-${event.type}`}>
+              <span>{event.type === 'goal' ? '⚽' : event.type === 'yellow' ? '🟨' : event.type === 'red' ? '🟥' : '🔄'}</span>
+              <span className="tabular-nums">{event.minute}&apos;</span>
+              <span className="truncate">{event.player}</span>
+            </span>
+          ) : (
+            <span className="text-ahly-muted/40">No events</span>
+          )}
+          {events.length > 1 && (
+            <span className="text-[10px] text-ahly-muted/30 shrink-0 ml-auto">{_ei + 1}/{events.length}</span>
+          )}
+        </div>
+
+        <Link to="/live" className="ml-auto shrink-0 flex items-center gap-1 px-2 py-0.5 rounded bg-ahly-red/15 text-ahly-red border border-ahly-red/20 hover:bg-ahly-red/25 transition-all text-[10px] font-medium">
+          Watch <ChevronRight className="w-2.5 h-2.5" />
+        </Link>
       </div>
     </div>
   );
