@@ -10,7 +10,6 @@ import {
   streamSources,
   historicalMatches,
   otherLeagueMatches,
-  liveMatch as mockLiveMatch,
 } from '../data/mockData';
 
 const API_KEY = import.meta.env.VITE_API_FOOTBALL_KEY;
@@ -141,7 +140,7 @@ export async function getStandings(): Promise<Standing[]> {
 }
 
 export async function getLiveMatch(): Promise<Match | null> {
-  if (!isLiveMode()) return mockLiveMatch;
+  if (!isLiveMode()) return null;
 
   return cachedRequest('live_match', async () => {
     try {

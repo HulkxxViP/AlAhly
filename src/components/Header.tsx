@@ -232,12 +232,12 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </div>
         </div>
 
-        <div className="hidden md:flex items-center gap-1.5 text-[10px]">
-          <span className="text-ahly-muted/40">Created with</span>
-          <span className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-gradient-to-r from-ahly-red/10 via-ahly-red/20 to-ahly-red/10 border border-ahly-red/20">
-            <span className="animate-heart-pulse text-red-500" style={{ fontSize: '0.55rem' }}>❤</span>
-            <span className="font-medium bg-gradient-to-r from-ahly-gold to-ahly-red bg-clip-text text-transparent">By</span>
-            <span className="font-bold bg-gradient-to-r from-ahly-gold via-ahly-red to-ahly-gold bg-clip-text text-transparent bg-[length:200%_100%] animate-shimmer-text">Hulk</span>
+        <div className="hidden md:flex items-center gap-1.5">
+          <span className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-ahly-red/15 via-ahly-red/25 to-ahly-gold/10 border border-ahly-red/30 shadow-lg shadow-ahly-red/5 group hover:border-ahly-gold/40 transition-all duration-500">
+            <span className="text-[10px] font-medium text-ahly-muted/70 tracking-wide">Created with</span>
+            <span className="animate-heart-pulse text-red-500 drop-shadow-[0_0_6px_rgba(200,16,46,0.6)]" style={{ fontSize: '0.7rem', lineHeight: 1 }}>❤</span>
+            <span className="text-[10px] font-semibold text-ahly-muted/70 tracking-wide">By</span>
+            <span className="text-xs font-extrabold bg-gradient-to-r from-ahly-gold via-yellow-300 to-ahly-red bg-clip-text text-transparent bg-[length:200%_100%] animate-shimmer-text drop-shadow-[0_0_8px_rgba(212,175,55,0.3)]">Hulk</span>
           </span>
         </div>
 
