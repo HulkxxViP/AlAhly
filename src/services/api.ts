@@ -28,6 +28,7 @@ const cache = new Map<string, { data: unknown; timestamp: number }>();
 const CACHE_DURATION = 10 * 60 * 1000;
 const LIVE_CACHE_DURATION = 30 * 1000;
 const SQUAD_CACHE_KEY = 'ahly_squad_cache';
+const SQUAD_CACHE_DURATION = 30 * 60 * 1000;
 
 async function cachedRequest<T>(key: string, fetcher: () => Promise<T>, ttl = CACHE_DURATION): Promise<T> {
   const cached = cache.get(key);
@@ -280,29 +281,37 @@ export async function getNews(): Promise<NewsItem[]> {
 }
 
 export async function getSquad() {
+  if (!isLiveMode()) return squad;
+
   try {
-    if (API_KEY && API_KEY !== 'your_api_key_here') {
-      const { data } = await apiClient.get('/players/squads', {
-        params: { team: AHLY_TEAM_ID },
-      });
-      const players = data.response?.[0]?.players || [];
-      if (players.length > 0) {
-        const mapped = players.map((p: Record<string, unknown>, i: number) => ({
-          id: (p.id as number) || i,
-          name: (p.name as string) || '',
-          position: (p.position as string) || '',
-          number: (p.number as number) || i + 1,
-          nationality: (p.nationality as string) || '',
-          age: (p.age as number) || 0,
-          photo: p.photo as string | undefined,
-        }));
-        localStorage.setItem(SQUAD_CACHE_KEY, JSON.stringify({ data: mapped, timestamp: Date.now() }));
-        return mapped;
+    const cached = localStorage.getItem(SQUAD_CACHE_KEY);
+    if (cached) {
+      const parsed = JSON.parse(cached);
+      if (Array.isArray(parsed.data) && parsed.data.length > 0 && Date.now() - parsed.timestamp < SQUAD_CACHE_DURATION) {
+        return parsed.data;
       }
     }
-  } catch {
-    // API call failed, fall through to cache
-  }
+  } catch {}
+
+  try {
+    const { data } = await apiClient.get('/players/squads', {
+      params: { team: AHLY_TEAM_ID },
+    });
+    const players = data.response?.[0]?.players || [];
+    if (players.length > 0) {
+      const mapped = players.map((p: Record<string, unknown>, i: number) => ({
+        id: (p.id as number) || i,
+        name: (p.name as string) || '',
+        position: (p.position as string) || '',
+        number: (p.number as number) || i + 1,
+        nationality: (p.nationality as string) || '',
+        age: (p.age as number) || 0,
+        photo: p.photo as string | undefined,
+      }));
+      localStorage.setItem(SQUAD_CACHE_KEY, JSON.stringify({ data: mapped, timestamp: Date.now() }));
+      return mapped;
+    }
+  } catch {}
 
   try {
     const cached = localStorage.getItem(SQUAD_CACHE_KEY);
