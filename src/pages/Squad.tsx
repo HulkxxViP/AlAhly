@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { Users, Filter } from 'lucide-react';
 import PlayerCard from '../components/PlayerCard';
 import PlayerModal from '../components/PlayerModal';
+import { useLanguage } from '../context/LanguageContext';
 import { getSquad } from '../services/api';
 import { Player } from '../types';
 
 type PositionFilter = 'all' | 'Goalkeeper' | 'Defender' | 'Midfielder' | 'Forward';
 
 export default function Squad() {
+  const { t } = useLanguage();
   const [players, setPlayers] = useState<Player[]>([]);
   const [filter, setFilter] = useState<PositionFilter>('all');
   const [loading, setLoading] = useState(true);
@@ -39,7 +41,7 @@ export default function Squad() {
     <div className="page-enter">
       <div className="flex items-center gap-3 mb-6">
         <Users className="w-7 h-7 text-ahly-red" />
-        <h1 className="page-header mb-0">Squad</h1>
+        <h1 className="page-header mb-0">{t('squad.title')}</h1>
       </div>
 
       <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2">
@@ -104,7 +106,7 @@ export default function Squad() {
               color="text-blue-400"
             />
             <StatItem
-              label="Squad Size"
+              label={t('squad.title') + ' Size'}
               value={String(players.length)}
               color="text-ahly-gold"
             />

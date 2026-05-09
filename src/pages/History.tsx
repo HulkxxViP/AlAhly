@@ -10,6 +10,7 @@ import {
   Filter,
   ArrowUpDown,
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 import MatchCard from '../components/MatchCard';
 import { getHistory, getRecentMatches, getTeamStats } from '../services/api';
 import { Match, TeamStats } from '../types';
@@ -22,6 +23,7 @@ function getSeason(dateStr: string): string {
 }
 
 export default function HistoryPage() {
+  const { t } = useLanguage();
   const [allMatches, setAllMatches] = useState<Match[]>([]);
   const [recent, setRecent] = useState<Match[]>([]);
   const [stats, setStats] = useState<TeamStats | null>(null);
@@ -126,7 +128,7 @@ export default function HistoryPage() {
       <div className="page-enter">
         <div className="flex items-center gap-3 mb-6">
           <History className="w-7 h-7 text-ahly-red" />
-          <h1 className="page-header mb-0">Match History</h1>
+<h1 className="page-header mb-0">{t('history.title')}</h1>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
           {[1, 2, 3, 4, 5].map((i) => (
@@ -146,15 +148,15 @@ export default function HistoryPage() {
     <div className="page-enter">
       <div className="flex items-center gap-3 mb-6">
         <History className="w-7 h-7 text-ahly-red" />
-        <h1 className="page-header mb-0">Match History</h1>
+        <h1 className="page-header mb-0">{t('history.title')}</h1>
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6 stagger-fade">
-        <QuickStat icon={<Trophy className="w-4 h-4 text-ahly-gold" />} label="Total Matches" value={String(combined.length)} />
-        <QuickStat icon={<TrendingUp className="w-4 h-4 text-green-400" />} label="Wins" value={String(wins)} />
-        <QuickStat icon={<Target className="w-4 h-4 text-yellow-400" />} label="Draws" value={String(draws)} />
-        <QuickStat icon={<Shield className="w-4 h-4 text-red-400" />} label="Losses" value={String(losses)} />
-        <QuickStat icon={<Award className="w-4 h-4 text-purple-400" />} label="Win Rate" value={combined.length ? `${Math.round((wins / combined.length) * 100)}%` : '0%'} />
+        <QuickStat icon={<Trophy className="w-4 h-4 text-ahly-gold" />} label="Total" value={String(combined.length)} />
+        <QuickStat icon={<TrendingUp className="w-4 h-4 text-green-400" />} label={t('common.win')} value={String(wins)} />
+        <QuickStat icon={<Target className="w-4 h-4 text-yellow-400" />} label={t('common.draw')} value={String(draws)} />
+        <QuickStat icon={<Shield className="w-4 h-4 text-red-400" />} label={t('common.loss')} value={String(losses)} />
+        <QuickStat icon={<Award className="w-4 h-4 text-purple-400" />} label={t('dashboard.winRate')} value={combined.length ? `${Math.round((wins / combined.length) * 100)}%` : '0%'} />
       </div>
 
       <div className="flex flex-col md:flex-row gap-3 mb-6">
@@ -162,7 +164,7 @@ export default function HistoryPage() {
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ahly-muted" />
           <input
             type="text"
-            placeholder="Search by team, competition, or venue..."
+            placeholder={t('header.search')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full bg-ahly-card border border-ahly-border rounded-lg pl-10 pr-3 py-2 text-sm text-white placeholder:text-ahly-muted/50 outline-none focus:border-ahly-red/50 transition-colors"
@@ -174,7 +176,7 @@ export default function HistoryPage() {
             onChange={(e) => setFilter(e.target.value as typeof filter)}
             className="bg-ahly-card border border-ahly-border rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-ahly-red/50 transition-colors"
           >
-            <option value="all">All Competitions</option>
+            <option value="all">{t('matches.allCompetitions')}</option>
             <option value="league">League</option>
             <option value="continental">Continental</option>
             <option value="cup">Cup</option>
@@ -185,10 +187,10 @@ export default function HistoryPage() {
             onChange={(e) => setResultFilter(e.target.value as typeof resultFilter)}
             className="bg-ahly-card border border-ahly-border rounded-lg px-3 py-2 text-xs text-white outline-none focus:border-ahly-red/50 transition-colors"
           >
-            <option value="all">All Results</option>
-            <option value="win">Wins</option>
-            <option value="draw">Draws</option>
-            <option value="loss">Losses</option>
+            <option value="all">{t('matches.allCompetitions')}</option>
+            <option value="win">{t('common.win')}</option>
+            <option value="draw">{t('common.draw')}</option>
+            <option value="loss">{t('common.loss')}</option>
           </select>
           <select
             value={seasonFilter}

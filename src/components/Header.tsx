@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Menu, Bell, Search, X, Trophy, Calendar, Newspaper, Users, ExternalLink, Clock, ChevronRight, Zap } from 'lucide-react';
+import { Menu, Bell, Search, X, Trophy, Calendar, Newspaper, Users, ExternalLink, Clock, ChevronRight, Zap, Globe } from 'lucide-react';
 import { recentMatches, upcomingMatches, mockNews, squad } from '../data/mockData';
 import { getLiveMatch, getUpcomingMatches, getRecentMatches } from '../services/api';
 import { Match, MatchEvent } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 const basePath = import.meta.env.BASE_URL;
 
@@ -20,6 +21,7 @@ interface SearchResult {
 }
 
 export default function Header({ onMenuClick }: HeaderProps) {
+  const { t, lang, setLang } = useLanguage();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<SearchResult[]>([]);
   const [showResults, setShowResults] = useState(false);
@@ -187,7 +189,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
               onChange={(e) => { setQuery(e.target.value); setShowResults(true); setFocusedIndex(-1); }}
               onFocus={() => query && setShowResults(true)}
               onKeyDown={handleKeyDown}
-              placeholder="Search matches, players, news..."
+              placeholder={t('header.search')}
               className="bg-transparent border-none outline-none text-sm text-ahly-text placeholder:text-ahly-muted w-full"
             />
             {query && (
@@ -223,8 +225,8 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 ) : (
                   <div className="px-4 py-6 text-center">
                     <Search className="w-8 h-8 text-ahly-muted/30 mx-auto mb-2" />
-                    <p className="text-sm text-ahly-muted">No results found</p>
-                    <p className="text-xs text-ahly-muted/50 mt-0.5">Try a different search term</p>
+                    <p className="text-sm text-ahly-muted">{t('header.noResults')}</p>
+                    <p className="text-xs text-ahly-muted/50 mt-0.5">{t('header.tryDifferent')}</p>
                   </div>
                 )}
               </div>
@@ -234,9 +236,9 @@ export default function Header({ onMenuClick }: HeaderProps) {
 
         <div className="flex items-center gap-3">
           <span className="hidden sm:inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-ahly-red/20 via-ahly-red/30 to-ahly-gold/15 border border-ahly-red/40 shadow-lg shadow-ahly-red/10 group hover:border-ahly-gold/50 hover:shadow-ahly-gold/10 transition-all duration-500">
-            <span className="text-[10px] font-medium text-ahly-muted/80 tracking-wide">Created with</span>
+            <span className="text-[10px] font-medium text-ahly-muted/80 tracking-wide">{t('header.createdWith')}</span>
             <span className="animate-heart-pulse text-red-500 drop-shadow-[0_0_8px_rgba(200,16,46,0.7)]" style={{ fontSize: '0.75rem', lineHeight: 1 }}>❤</span>
-            <span className="text-[10px] font-semibold text-ahly-muted/80 tracking-wide">By</span>
+            <span className="text-[10px] font-semibold text-ahly-muted/80 tracking-wide">{t('header.by')}</span>
             <span className="text-xs font-extrabold bg-gradient-to-r from-ahly-gold via-yellow-300 to-ahly-red bg-clip-text text-transparent bg-[length:200%_100%] animate-shimmer-text drop-shadow-[0_0_10px_rgba(212,175,55,0.4)]">Hulk</span>
           </span>
 
@@ -248,6 +250,17 @@ export default function Header({ onMenuClick }: HeaderProps) {
               <Search className="w-5 h-5" />
             </button>
           </div>
+
+          <button
+            onClick={() => setLang(lang === 'en' ? 'ar' : 'en')}
+            className="p-2 rounded-lg hover:bg-ahly-card text-ahly-muted hover:text-white transition-colors relative"
+            title={lang === 'en' ? 'العربية' : 'English'}
+          >
+            <Globe className="w-5 h-5" />
+            <span className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 text-[8px] font-bold uppercase tracking-wider text-ahly-gold">
+              {lang === 'en' ? 'AR' : 'EN'}
+            </span>
+          </button>
 
           <button className="relative p-2 rounded-lg hover:bg-ahly-card text-ahly-muted hover:text-white transition-colors">
             <Bell className="w-5 h-5" />
@@ -273,7 +286,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                 if (e.key === 'Enter' && results.length > 0) { selectResult(results[0]); }
                 if (e.key === 'Escape') { setShowMobileSearch(false); setQuery(''); setResults([]); }
               }}
-              placeholder="Search..."
+              placeholder={t('header.search')}
               className="bg-transparent border-none outline-none text-sm text-ahly-text placeholder:text-ahly-muted w-full"
             />
             <button onClick={() => { setShowMobileSearch(false); setQuery(''); setResults([]); }} className="p-1 rounded hover:bg-ahly-cardHover text-ahly-muted transition-colors shrink-0">
@@ -291,7 +304,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
                   </div>
                 </button>
               )) : (
-                <p className="text-xs text-ahly-muted text-center py-3">No results</p>
+                <p className="text-xs text-ahly-muted text-center py-3">{t('header.noResults')}</p>
               )}
             </div>
           )}
@@ -378,6 +391,7 @@ function HeaderLiveBarInner({ match, event, totalEvents, eventIndex: _ei }: { ma
 }
 
 function HeaderNextBar({ match }: { match: Match }) {
+  const { t } = useLanguage();
   const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 });
 
   useEffect(() => {
@@ -397,44 +411,41 @@ function HeaderNextBar({ match }: { match: Match }) {
     return () => clearInterval(interval);
   }, [match.date, match.time]);
 
+  const isAhlyHome = match.homeTeam.isAhly;
+  const ahlyTeam = isAhlyHome ? match.homeTeam : match.awayTeam;
+  const oppTeam = isAhlyHome ? match.awayTeam : match.homeTeam;
+
   return (
     <div className="flex items-center gap-2 md:gap-4 py-1.5 text-[11px] overflow-hidden">
-      <div className="flex items-center gap-1.5 shrink-0">
-        <Clock className="w-3 h-3 text-ahly-gold" />
-        <span className="text-ahly-gold font-bold text-[10px] tracking-wide uppercase">Next</span>
+      <Link to="/matches" className="flex items-center gap-1.5 shrink-0 group">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ahly-gold opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-ahly-gold" />
+        </span>
+        <span className="text-xs font-bold text-ahly-gold tracking-wide">{t('header.next')}</span>
+      </Link>
+
+      <span className="text-ahly-text font-semibold truncate max-w-[80px]">{ahlyTeam.name}</span>
+      <span className="font-bold text-white tabular-nums bg-ahly-dark/60 px-1.5 py-0.5 rounded border border-ahly-gold/20">
+        {String(timeLeft.d * 24 + timeLeft.h).padStart(2, '0')}h {String(timeLeft.m).padStart(2, '0')}m {String(timeLeft.s).padStart(2, '0')}s
+      </span>
+      <span className="text-ahly-muted truncate max-w-[80px] hidden sm:inline">{oppTeam.name}</span>
+
+      <div className="hidden md:flex items-center gap-1.5 text-ahly-muted flex-1 min-w-0 border-l border-ahly-border/20 pl-2">
+        <div className="flex-1 h-1 bg-ahly-border/20 rounded-full overflow-hidden relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-ahly-gold/40 to-transparent animate-shimmer" />
+        </div>
       </div>
 
-      <span className="text-ahly-text font-semibold truncate max-w-[80px]">{match.homeTeam.name}</span>
-      <span className="text-ahly-muted/40 text-[10px]">vs</span>
-      <span className="text-ahly-text font-semibold truncate max-w-[80px]">{match.awayTeam.name}</span>
-
-      <div className="hidden md:flex items-center gap-1 ml-auto shrink-0 tabular-nums text-[11px]">
-        {timeLeft.d > 0 && (
-          <span className="bg-ahly-card border border-ahly-border rounded px-1 py-0.5 leading-none">
-            <span className="text-white font-bold">{timeLeft.d}</span><span className="text-ahly-muted text-[9px] ml-0.5">d</span>
-          </span>
-        )}
-        <span className="bg-ahly-card border border-ahly-border rounded px-1 py-0.5 leading-none">
-          <span className="text-white font-bold">{String(timeLeft.h).padStart(2, '0')}</span><span className="text-ahly-muted text-[9px] ml-0.5">h</span>
-        </span>
-        <span className="text-white font-bold">:</span>
-        <span className="bg-ahly-card border border-ahly-border rounded px-1 py-0.5 leading-none">
-          <span className="text-white font-bold">{String(timeLeft.m).padStart(2, '0')}</span><span className="text-ahly-muted text-[9px] ml-0.5">m</span>
-        </span>
-        <span className="text-white font-bold">:</span>
-        <span className="bg-ahly-card border border-ahly-border rounded px-1 py-0.5 leading-none">
-          <span className="text-white font-bold">{String(timeLeft.s).padStart(2, '0')}</span><span className="text-ahly-muted text-[9px] ml-0.5">s</span>
-        </span>
-      </div>
-
-      <Link to="/matches" className="ml-auto md:ml-2 shrink-0 text-ahly-muted/50 hover:text-ahly-muted transition-colors text-[10px]">
-        Details <ChevronRight className="w-2.5 h-2.5 inline" />
+      <Link to="/matches" className="ml-auto shrink-0 flex items-center gap-1 px-2 py-0.5 rounded bg-ahly-gold/10 text-ahly-gold border border-ahly-gold/20 hover:bg-ahly-gold/20 transition-all text-[10px] font-medium">
+        {t('header.details')} <ChevronRight className="w-2.5 h-2.5" />
       </Link>
     </div>
   );
 }
 
 function HeaderLastBar({ match }: { match: Match }) {
+  const { t } = useLanguage();
   const isAhly = match.homeTeam.isAhly || match.awayTeam.isAhly;
   const ahlyWon = isAhly && (
     (match.homeTeam.isAhly && (match.homeScore ?? 0) > (match.awayScore ?? 0)) ||
@@ -445,7 +456,7 @@ function HeaderLastBar({ match }: { match: Match }) {
     <div className="flex items-center gap-2 md:gap-4 py-1.5 text-[11px] overflow-hidden">
       <Trophy className={`w-3 h-3 shrink-0 ${ahlyWon ? 'text-ahly-gold' : 'text-ahly-muted'}`} />
       <span className={`font-bold text-[10px] tracking-wide uppercase shrink-0 ${ahlyWon ? 'text-green-400' : 'text-ahly-muted'}`}>
-        {ahlyWon ? 'Win' : match.homeScore === match.awayScore ? 'Draw' : 'Loss'}
+        {ahlyWon ? t('common.win') : match.homeScore === match.awayScore ? t('common.draw') : t('common.loss')}
       </span>
 
       <span className="text-ahly-text font-semibold truncate max-w-[80px]">{match.homeTeam.name}</span>
@@ -457,7 +468,7 @@ function HeaderLastBar({ match }: { match: Match }) {
       <span className="hidden md:inline text-ahly-muted/40 ml-auto truncate max-w-[120px]">{match.competition.name}</span>
 
       <Link to="/matches" className="shrink-0 text-ahly-muted/40 hover:text-ahly-muted transition-colors text-[10px] ml-2">
-        All <ChevronRight className="w-2.5 h-2.5 inline" />
+        {t('header.all')} <ChevronRight className="w-2.5 h-2.5 inline" />
       </Link>
     </div>
   );

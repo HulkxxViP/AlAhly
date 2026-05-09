@@ -1,14 +1,12 @@
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { matchGallery } from '../data/mockData';
+import { useState, useMemo } from 'react';
+import { ChevronLeft, ChevronRight, Camera } from 'lucide-react';
+import { getMatchGallery, recentMatches } from '../data/mockData';
 import { MatchGalleryItem } from '../types';
-import { ChevronLeft, ChevronRight, Camera, ExternalLink } from 'lucide-react';
-
-const basePath = import.meta.env.BASE_URL;
 
 export default function MatchGallery({ limit }: { limit?: number }) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const items = limit ? matchGallery.slice(0, limit) : matchGallery;
+  const allItems = useMemo(() => getMatchGallery(), []);
+  const items = limit ? allItems.slice(0, limit) : allItems;
 
   return (
     <div>
@@ -42,26 +40,69 @@ export default function MatchGallery({ limit }: { limit?: number }) {
 function GalleryCard({ item, index, onSelect }: { item: MatchGalleryItem; index: number; onSelect: () => void }) {
   const [failed, setFailed] = useState(false);
 
+  const match = recentMatches.find((m) => m.id === item.matchId);
+  const isAhlyHome = match?.homeTeam.isAhly;
+  const isAhlyAway = match?.awayTeam.isAhly;
+
   return (
     <button
       onClick={onSelect}
       className="glass-card-elevated overflow-hidden group text-left rounded-xl hover:border-ahly-red/40 transition-all duration-300 animate-scale-in cursor-pointer"
       style={{ animationDelay: `${index * 80}ms` }}
     >
-      <div className="relative aspect-[16/9] bg-ahly-dark/80 overflow-hidden">
+      <div className="relative aspect-[16/9] bg-gradient-to-br from-ahly-dark via-ahly-card to-ahly-dark overflow-hidden">
         {failed ? (
-          <div className="w-full h-full flex items-center justify-center">
-            <Camera className="w-8 h-8 text-ahly-muted/30" />
+          <div className="w-full h-full flex items-center justify-center gap-4 p-4">
+            {match && (
+              <>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-12 h-12 rounded-full bg-ahly-dark/70 border border-ahly-red/30 flex items-center justify-center p-1">
+                    <img src={match.homeTeam.logo} alt={match.homeTeam.name} className="w-full h-full object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  </div>
+                  <span className="text-[10px] text-ahly-muted text-center leading-tight max-w-16 truncate">{match.homeTeam.name}</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <span className="text-lg font-bold text-white tabular-nums">
+                    {match.homeScore ?? '-'}:{match.awayScore ?? '-'}
+                  </span>
+                  <span className="text-[10px] text-ahly-muted/50">FT</span>
+                </div>
+                <div className="flex flex-col items-center gap-1">
+                  <div className="w-12 h-12 rounded-full bg-ahly-dark/70 border border-ahly-gold/30 flex items-center justify-center p-1">
+                    <img src={match.awayTeam.logo} alt={match.awayTeam.name} className="w-full h-full object-contain" onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+                  </div>
+                  <span className="text-[10px] text-ahly-muted text-center leading-tight max-w-16 truncate">{match.awayTeam.name}</span>
+                </div>
+              </>
+            )}
+            {!match && <Camera className="w-8 h-8 text-ahly-muted/30" />}
           </div>
         ) : (
-          <img
-            src={item.imageUrl}
-            alt={item.caption}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            onError={() => setFailed(true)}
-          />
+          <>
+            <img
+              src={item.imageUrl}
+              alt={item.caption}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              onError={() => setFailed(true)}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/20" />
+            {match && (
+              <div className="absolute bottom-3 left-3 right-3 flex items-center justify-center gap-3">
+                <div className="flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-3 py-1.5 border border-white/10">
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center">
+                    <img src={match.homeTeam.logo} alt="" className="w-full h-full object-contain" />
+                  </div>
+                  <span className={`text-xs font-bold ${isAhlyHome ? 'text-ahly-red' : 'text-white/80'}`}>{match.homeScore}</span>
+                  <span className="text-[10px] text-white/50">:</span>
+                  <span className={`text-xs font-bold ${isAhlyAway ? 'text-ahly-red' : 'text-white/80'}`}>{match.awayScore}</span>
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center">
+                    <img src={match.awayTeam.logo} alt="" className="w-full h-full object-contain" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         )}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <div className="absolute top-2 right-2 px-2 py-0.5 rounded-full bg-black/50 backdrop-blur-sm text-[10px] text-white/80 border border-white/10">
           {item.matchTitle}
         </div>

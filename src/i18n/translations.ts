@@ -7,6 +7,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.standings': 'Standings',
     'nav.history': 'History',
     'nav.news': 'News',
+    'nav.media': 'Media',
     'nav.live': 'Live & Streaming',
     'nav.liveTv': 'Live TV',
     'nav.squad': 'Squad',
@@ -16,6 +17,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'dashboard.upcomingFixtures': 'Upcoming Fixtures',
     'dashboard.leagueTable': 'League Table',
     'dashboard.latestNews': 'Latest News',
+    'dashboard.latestPhotos': 'Latest Match Photos',
     'dashboard.nextMatch': 'Next Match',
     'dashboard.matchup': 'Matchup',
     'dashboard.leaguePosition': 'League Position',
@@ -27,6 +29,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     'dashboard.pts': 'pts',
     'dashboard.notificationsOn': 'Notifications On',
     'dashboard.enableAlerts': 'Enable Alerts',
+    'dashboard.viewAll': 'View All',
+    'dashboard.matchStartsSoon': 'Match starts soon — live events will appear here automatically',
+    'dashboard.noLiveMatches': 'No Live Matches',
+    'dashboard.waitingForMatch': 'Waiting for the next match to begin',
 
     'live.liveStreaming': 'Live & Streaming',
     'live.matchInProgress': 'Match In Progress',
@@ -62,6 +68,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'matches.title': 'Matches',
     'matches.allCompetitions': 'All Competitions',
     'matches.noMatches': 'No matches found',
+    'matches.results': 'Results',
+    'matches.upcoming': 'Upcoming',
     'matches.viewAll': 'View All',
 
     'squad.title': 'Squad',
@@ -78,15 +86,35 @@ export const translations: Record<Lang, Record<string, string>> = {
     'news.title': 'News',
     'news.latest': 'Latest News',
 
+    'media.title': 'Media Gallery',
+    'media.subtitle': 'Match photos & highlights',
+
     'footer.honoring': 'Honoring the Club of the Century',
     'footer.description': 'Al-Ahly Tracker — النادي الأهلي — Fan project for informational purposes. Not affiliated with Al Ahly SC.',
     'footer.createdWith': 'Created with',
+    'footer.liveMatches': 'Live Matches',
 
     'header.search': 'Search matches, players, news...',
+    'header.createdWith': 'Created with',
+    'header.by': 'By',
+    'header.next': 'Next',
+    'header.details': 'Details',
+    'header.watch': 'Watch',
+    'header.noEvents': 'No events',
+    'header.noResults': 'No results found',
+    'header.tryDifferent': 'Try a different search term',
+    'header.all': 'All',
 
     'liveTv.title': 'Live TV Channels',
 
     'history.title': 'History',
+
+    'common.next': 'Next',
+    'common.live': 'LIVE',
+    'common.win': 'Win',
+    'common.draw': 'Draw',
+    'common.loss': 'Loss',
+    'common.vs': 'vs',
   },
   ar: {
     'nav.dashboard': 'الرئيسية',
@@ -94,6 +122,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.standings': 'الترتيب',
     'nav.history': 'التاريخ',
     'nav.news': 'الأخبار',
+    'nav.media': 'الصور',
     'nav.live': 'البث المباشر',
     'nav.liveTv': 'القنوات التلفزيونية',
     'nav.squad': 'الفريق',
@@ -103,6 +132,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'dashboard.upcomingFixtures': 'المباريات القادمة',
     'dashboard.leagueTable': 'جدول الدوري',
     'dashboard.latestNews': 'آخر الأخبار',
+    'dashboard.latestPhotos': 'أحدث صور المباريات',
     'dashboard.nextMatch': 'المباراة القادمة',
     'dashboard.matchup': 'المواجهة',
     'dashboard.leaguePosition': 'المركز',
@@ -114,6 +144,10 @@ export const translations: Record<Lang, Record<string, string>> = {
     'dashboard.pts': 'نقطة',
     'dashboard.notificationsOn': 'الإشعارات مفعلة',
     'dashboard.enableAlerts': 'تفعيل الإشعارات',
+    'dashboard.viewAll': 'عرض الكل',
+    'dashboard.matchStartsSoon': 'المباراة تبدأ قريباً — ستظهر الأحداث المباشرة هنا تلقائياً',
+    'dashboard.noLiveMatches': 'لا توجد مباريات مباشرة',
+    'dashboard.waitingForMatch': 'بانتظار المباراة القادمة',
 
     'live.liveStreaming': 'البث المباشر',
     'live.matchInProgress': 'المباراة جارية الآن',
@@ -149,6 +183,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     'matches.title': 'المباريات',
     'matches.allCompetitions': 'جميع البطولات',
     'matches.noMatches': 'لا توجد مباريات',
+    'matches.results': 'النتائج',
+    'matches.upcoming': 'القادمة',
     'matches.viewAll': 'عرض الكل',
 
     'squad.title': 'الفريق',
@@ -165,14 +201,34 @@ export const translations: Record<Lang, Record<string, string>> = {
     'news.title': 'الأخبار',
     'news.latest': 'آخر الأخبار',
 
+    'media.title': 'معرض الصور',
+    'media.subtitle': 'صور المباريات وأبرز اللقطات',
+
     'footer.honoring': 'تكريماً لنادي القرن',
     'footer.description': 'Al-Ahly Tracker — النادي الأهلي — مشروع جماهيري لأغراض معلوماتية. غير تابع للنادي الأهلي.',
     'footer.createdWith': 'صنع بـ',
+    'footer.liveMatches': 'المباريات المباشرة',
 
     'header.search': 'ابحث عن مباريات، لاعبين، أخبار...',
+    'header.createdWith': 'صنع بـ',
+    'header.by': 'بواسطة',
+    'header.next': 'التالي',
+    'header.details': 'التفاصيل',
+    'header.watch': 'مشاهدة',
+    'header.noEvents': 'لا توجد أحداث',
+    'header.noResults': 'لا توجد نتائج',
+    'header.tryDifferent': 'جرب مصطلح بحث مختلف',
+    'header.all': 'الكل',
 
     'liveTv.title': 'القنوات التلفزيونية المباشرة',
 
     'history.title': 'التاريخ',
+
+    'common.next': 'التالي',
+    'common.live': 'مباشر',
+    'common.win': 'فوز',
+    'common.draw': 'تعادل',
+    'common.loss': 'خسارة',
+    'common.vs': 'ضد',
   },
 };

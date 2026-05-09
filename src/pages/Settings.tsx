@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
-import { Settings as SettingsIcon, ExternalLink, Tv, Plus, Trash2, Code } from 'lucide-react';
+import { Settings as SettingsIcon, ExternalLink, Tv, Plus, Trash2, Code, Globe } from 'lucide-react';
 import { getCustomStreams, saveCustomStreams } from '../services/api';
 import { StreamSource } from '../types';
+import { useLanguage } from '../context/LanguageContext';
 
 const basePath = import.meta.env.BASE_URL;
 
@@ -12,6 +13,7 @@ function extractEmbedUrl(input: string): string {
 }
 
 export default function Settings() {
+  const { t, lang, setLang } = useLanguage();
   const [customStreams, setCustomStreams] = useState<StreamSource[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [name, setName] = useState('');
@@ -61,7 +63,7 @@ export default function Settings() {
     <div className="animate-fade-in max-w-2xl">
       <div className="flex items-center gap-3 mb-6">
         <SettingsIcon className="w-7 h-7 text-ahly-red" />
-        <h1 className="page-header mb-0">Settings</h1>
+        <h1 className="page-header mb-0">{t('settings.title')}</h1>
       </div>
 
       <div className="space-y-6">
@@ -71,6 +73,36 @@ export default function Settings() {
           <p className="text-sm text-ahly-muted mb-1">Track Al Ahly SC matches, standings, news & more</p>
           <p className="text-ahly-gold text-sm mt-2 font-medium">النادي الأهلي - نادي القرن</p>
           <p className="text-xs text-ahly-muted mt-1">Club of the Century - Est. 1907</p>
+        </div>
+
+        {/* Language */}
+        <div className="glass-card p-6">
+          <h2 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
+            <Globe className="w-5 h-5 text-ahly-red" />
+            {t('settings.language')}
+          </h2>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setLang('en')}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all border ${
+                lang === 'en'
+                  ? 'bg-ahly-red text-white border-ahly-red shadow-lg shadow-ahly-red/20'
+                  : 'bg-ahly-card text-ahly-muted border-ahly-border hover:text-white hover:border-ahly-red/30'
+              }`}
+            >
+              {t('settings.english')}
+            </button>
+            <button
+              onClick={() => setLang('ar')}
+              className={`flex-1 py-2.5 rounded-lg text-sm font-semibold transition-all border ${
+                lang === 'ar'
+                  ? 'bg-ahly-red text-white border-ahly-red shadow-lg shadow-ahly-red/20'
+                  : 'bg-ahly-card text-ahly-muted border-ahly-border hover:text-white hover:border-ahly-red/30'
+              }`}
+            >
+              {t('settings.arabic')}
+            </button>
+          </div>
         </div>
 
         {/* Live Channels Configuration */}

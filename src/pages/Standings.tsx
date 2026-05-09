@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Trophy, TrendingUp, Target, Shield, Award } from 'lucide-react';
 import StandingsTable from '../components/StandingsTable';
+import { useLanguage } from '../context/LanguageContext';
 import { getStandings, getTeamStats } from '../services/api';
 import { Standing, TeamStats } from '../types';
 
 export default function Standings() {
+  const { t } = useLanguage();
   const [standings, setStandings] = useState<Standing[]>([]);
   const [stats, setStats] = useState<TeamStats | null>(null);
   const [loading, setLoading] = useState(true);
@@ -33,7 +35,7 @@ export default function Standings() {
     <div className="page-enter">
       <div className="flex items-center gap-3 mb-6">
         <Trophy className="w-7 h-7 text-ahly-gold" />
-        <h1 className="page-header mb-0">Egyptian Premier League - Championship Playoffs</h1>
+        <h1 className="page-header mb-0">{t('standings.title')}</h1>
       </div>
 
       {loading ? (
@@ -51,27 +53,27 @@ export default function Standings() {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-3 stagger-fade">
               <QuickStat
                 icon={<Trophy className="w-4 h-4 text-ahly-gold" />}
-                label="Position"
+                label={t('standings.position')}
                 value={`#${ahly.position}`}
               />
               <QuickStat
                 icon={<TrendingUp className="w-4 h-4 text-green-400" />}
-                label="Points"
+label={t('standings.points')}
                 value={String(ahly.points)}
               />
               <QuickStat
                 icon={<Target className="w-4 h-4 text-ahly-red" />}
-                label="Goals"
+                label={t('standings.goals')}
                 value={`${ahly.goalsFor} / ${ahly.goalsAgainst}`}
               />
               <QuickStat
                 icon={<Shield className="w-4 h-4 text-blue-400" />}
-                label="Goal Diff"
+                label={t('standings.goalDiff')}
                 value={`+${ahly.goalDifference}`}
               />
               <QuickStat
                 icon={<Award className="w-4 h-4 text-purple-400" />}
-                label="Record"
+                label={t('standings.record')}
                 value={`${ahly.won}W ${ahly.drawn}D ${ahly.lost}L`}
               />
             </div>
@@ -79,13 +81,13 @@ export default function Standings() {
 
           <div className="glass-card-elevated p-4 md:p-6 mt-6">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-lg font-semibold text-white">Championship Playoffs Table</h2>
+              <h2 className="text-lg font-semibold text-white">{t('standings.championshipTable')}</h2>
               <div className="flex items-center gap-4 text-xs text-ahly-muted">
                 <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-green-400" /> Title Contenders
+                  <span className="w-2 h-2 rounded-full bg-green-400" /> {t('standings.titleContenders')}
                 </span>
                 <span className="flex items-center gap-1">
-                  <span className="w-2 h-2 rounded-full bg-ahly-gold" /> Top 7
+                  <span className="w-2 h-2 rounded-full bg-ahly-gold" /> {t('standings.top7')}
                 </span>
               </div>
             </div>
@@ -96,7 +98,7 @@ export default function Standings() {
             <div className="glass-card-elevated p-5">
               <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
                 <Target className="w-4 h-4 text-ahly-red" />
-                Top Scorers (Al Ahly)
+                {t('standings.topScorers')}
               </h3>
               <div className="space-y-2">
                 {[
@@ -124,7 +126,7 @@ export default function Standings() {
             <div className="glass-card-elevated p-5">
               <h3 className="text-sm font-semibold text-white mb-3 flex items-center gap-2">
                 <TrendingUp className="w-4 h-4 text-green-400" />
-                Season Progress
+                {t('standings.seasonProgress')}
               </h3>
               <div className="space-y-4">
                 {ahly && (

@@ -1,12 +1,14 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Calendar, ArrowLeft, ArrowRight, ChevronDown } from 'lucide-react';
+import { Calendar, ArrowLeft, ArrowRight, ChevronDown, Trophy } from 'lucide-react';
 import MatchCard from '../components/MatchCard';
+import { useLanguage } from '../context/LanguageContext';
 import { getRecentMatches, getUpcomingMatches } from '../services/api';
 import { Match, Competition } from '../types';
 
 type Tab = 'results' | 'upcoming';
 
 export default function Matches() {
+  const { t } = useLanguage();
   const [tab, setTab] = useState<Tab>('results');
   const [compFilter, setCompFilter] = useState<number | 'all'>('all');
   const [recent, setRecent] = useState<Match[]>([]);
@@ -44,7 +46,7 @@ export default function Matches() {
     <div className="page-enter">
       <div className="flex items-center gap-3 mb-6">
         <Calendar className="w-7 h-7 text-ahly-red" />
-        <h1 className="page-header mb-0">Matches</h1>
+        <h1 className="page-header mb-0">{t('matches.title')}</h1>
       </div>
 
       {loading ? (
@@ -58,10 +60,10 @@ export default function Matches() {
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
             <div className="flex bg-ahly-card rounded-lg p-1 border border-ahly-border">
               <TabButton active={tab === 'results'} onClick={() => setTab('results')}>
-                <ArrowLeft className="w-4 h-4" /> Results
+                <ArrowLeft className="w-4 h-4" /> {t('matches.results')}
               </TabButton>
               <TabButton active={tab === 'upcoming'} onClick={() => setTab('upcoming')}>
-                Upcoming <ArrowRight className="w-4 h-4" />
+                {t('matches.upcoming')} <ArrowRight className="w-4 h-4" />
               </TabButton>
             </div>
 
@@ -71,7 +73,7 @@ export default function Matches() {
                 onChange={(e) => setCompFilter(e.target.value === 'all' ? 'all' : Number(e.target.value))}
                 className="appearance-none bg-ahly-card text-sm text-white border border-ahly-border rounded-lg px-4 py-2 pr-10 focus:outline-none focus:border-ahly-red cursor-pointer"
               >
-                <option value="all">All Competitions</option>
+                <option value="all">{t('matches.allCompetitions')}</option>
                 {competitions.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}

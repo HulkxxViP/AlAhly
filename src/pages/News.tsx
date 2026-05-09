@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { Newspaper, RefreshCw } from 'lucide-react';
 import NewsCard from '../components/NewsCard';
+import { useLanguage } from '../context/LanguageContext';
 import { getNews } from '../services/api';
 import { NewsItem } from '../types';
 
 type Category = 'all' | 'match' | 'transfer' | 'injury' | 'award' | 'general';
 
 export default function News() {
+  const { t } = useLanguage();
   const [news, setNews] = useState<NewsItem[]>([]);
   const [filter, setFilter] = useState<Category>('all');
   const [loading, setLoading] = useState(true);
@@ -47,7 +49,7 @@ export default function News() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Newspaper className="w-7 h-7 text-ahly-red" />
-          <h1 className="page-header mb-0">Latest News</h1>
+          <h1 className="page-header mb-0">{t('news.latest')}</h1>
         </div>
         <div className="flex items-center gap-3">
           {lastUpdated && (
@@ -64,7 +66,7 @@ export default function News() {
             disabled={refreshing}
           >
             <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh
+{t('live.refresh')}
           </button>
         </div>
       </div>

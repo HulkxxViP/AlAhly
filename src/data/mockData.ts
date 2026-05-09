@@ -406,28 +406,6 @@ export const squad: Player[] = [
   { id: 20, name: 'Taher Mohamed', nameAr: 'طاهر محمد', position: 'Forward', number: 19, nationality: 'Egypt', age: 28, goals: 6, assists: 5, appearances: 27 },
 ];
 
-export const liveMatch: Match = {
-  id: 1001,
-  homeTeam: AHLY_TEAM,
-  awayTeam: teams.zamalek,
-  homeScore: 1,
-  awayScore: 0,
-  date: '2026-05-09',
-  time: '21:00',
-  status: 'live',
-  minute: 67,
-  competition: competitions[0],
-  venue: 'Cairo International Stadium',
-  events: [
-    { minute: 23, type: 'goal', player: 'Trezeguet', team: 'home' },
-    { minute: 35, type: 'yellow', player: 'Rami Rabia', team: 'home' },
-    { minute: 44, type: 'yellow', player: 'Nasser Maher', team: 'away' },
-    { minute: 52, type: 'substitution', player: 'Percy Tau → Hussein El Shahat', team: 'home' },
-    { minute: 58, type: 'goal', player: 'Zizou', team: 'away' },
-    { minute: 62, type: 'substitution', player: 'Ahmed Sayed → Zizou', team: 'away' },
-  ],
-};
-
 export const streamSources: StreamSource[] = [
   { name: 'Al Ahly TV - YouTube', url: 'https://www.youtube.com/@AlAHLYTVCHANNEL/streams', quality: 'HD', language: 'Arabic', type: 'official' },
   { name: 'Al Ahly Matches - YouTube', url: 'https://www.youtube.com/@AlAHLYTVCHANNEL', quality: 'HD', language: 'Arabic', type: 'official' },
@@ -455,15 +433,15 @@ export const teamStats: TeamStats = {
 
 export const otherLeagueMatches: LeagueMatch[] = [
   { id: 301, homeTeam: 'Zamalek SC', awayTeam: 'Smouha SC', homeScore: 2, awayScore: 0, status: 'finished', competition: 'Egyptian Premier League' },
-  { id: 302, homeTeam: 'Pyramids FC', awayTeam: 'Ceramica Cleopatra', homeScore: null, awayScore: null, status: 'live', minute: 34, competition: 'Egyptian Premier League' },
+  { id: 302, homeTeam: 'Pyramids FC', awayTeam: 'Ceramica Cleopatra', homeScore: 2, awayScore: 1, status: 'finished', competition: 'Egyptian Premier League' },
   { id: 303, homeTeam: 'Al Masry', awayTeam: 'ENPPI', homeScore: 1, awayScore: 1, status: 'finished', competition: 'Egyptian Premier League' },
   { id: 304, homeTeam: 'El Gouna FC', awayTeam: 'ZED FC', homeScore: 0, awayScore: 2, status: 'finished', competition: 'Egyptian Premier League' },
-  { id: 305, homeTeam: 'Wadi Degla', awayTeam: 'National Bank', homeScore: null, awayScore: null, status: 'live', minute: 67, competition: 'Egyptian Premier League' },
+  { id: 305, homeTeam: 'Wadi Degla', awayTeam: 'National Bank', homeScore: 1, awayScore: 1, status: 'finished', competition: 'Egyptian Premier League' },
   { id: 306, homeTeam: 'Talaea El Gaish', awayTeam: 'Ismaily SC', homeScore: 2, awayScore: 1, status: 'finished', competition: 'Egyptian Premier League' },
   { id: 307, homeTeam: 'Petrojet', awayTeam: 'Al Ittihad', homeScore: 1, awayScore: 0, status: 'finished', competition: 'Egyptian Premier League' },
   { id: 308, homeTeam: 'Ghazl El Mahalla', awayTeam: 'Haras El Hodood', homeScore: 0, awayScore: 0, status: 'finished', competition: 'Egyptian Premier League' },
   { id: 309, homeTeam: 'Mamelodi Sundowns', awayTeam: 'ES Setif', homeScore: 3, awayScore: 1, status: 'finished', competition: 'CAF Champions League' },
-  { id: 310, homeTeam: 'Esperance Tunis', awayTeam: 'JS Kabylie', homeScore: 2, awayScore: 0, status: 'live', minute: 72, competition: 'CAF Champions League' },
+  { id: 310, homeTeam: 'Esperance Tunis', awayTeam: 'JS Kabylie', homeScore: 2, awayScore: 0, status: 'finished', competition: 'CAF Champions League' },
 ];
 
 export const historicalMatches: Match[] = [
@@ -802,85 +780,49 @@ export const historicalMatches: Match[] = [
   },
 ];
 
-export const matchGallery: MatchGalleryItem[] = [
-  {
-    id: 'g1',
-    imageUrl: 'https://picsum.photos/seed/ahly-g1/800/450',
-    caption: 'Al Ahly ease past Enppi 3-0 in Egyptian League to keep title hopes alive',
-    matchId: 3,
-    matchTitle: 'Al Ahly 3-0 ENPPI',
-    date: '2026-05-05',
-  },
-  {
-    id: 'g2',
-    imageUrl: 'https://picsum.photos/seed/ahly-g2/800/450',
-    caption: 'Bencharki leads Al Ahly to 3-0 win over Zamalek in Cairo derby',
-    matchId: 2,
-    matchTitle: 'Zamalek 0-3 Al Ahly',
-    date: '2026-05-01',
-  },
-  {
-    id: 'g3',
-    imageUrl: 'https://picsum.photos/seed/ahly-g3/800/450',
-    caption: 'Al Ahly beaten by Pyramids FC in Egyptian Premier League',
-    matchId: 4,
-    matchTitle: 'Pyramids 3-0 Al Ahly',
-    date: '2026-04-27',
-  },
-  {
-    id: 'g4',
-    imageUrl: 'https://picsum.photos/seed/ahly-g4/800/450',
-    caption: 'Al Ahly injury update ahead of Enppi league clash - Trezeguet sidelined',
-    matchId: 3,
-    matchTitle: 'Al Ahly 3-0 ENPPI',
-    date: '2026-05-04',
-  },
-  {
-    id: 'g5',
-    imageUrl: 'https://picsum.photos/seed/ahly-g5/800/450',
-    caption: 'Al Ahly squad training at WE Al Salam Stadium ahead of crucial playoff matches',
-    matchId: 3,
-    matchTitle: 'Al Ahly Training',
-    date: '2026-05-03',
-  },
-  {
-    id: 'g6',
-    imageUrl: 'https://picsum.photos/seed/ahly-g6/800/450',
-    caption: 'Trezeguet in fine form during Al Ahly victory over Ceramica Cleopatra',
-    matchId: 5,
-    matchTitle: 'Ceramica 1-1 Al Ahly',
-    date: '2026-04-07',
-  },
-  {
-    id: 'g7',
-    imageUrl: 'https://picsum.photos/seed/ahly-g7/800/450',
-    caption: 'Al Ahly fans fill Cairo International Stadium for the derby clash',
-    matchId: 2,
-    matchTitle: 'Zamalek 0-3 Al Ahly',
-    date: '2026-05-01',
-  },
-  {
-    id: 'g8',
-    imageUrl: 'https://picsum.photos/seed/ahly-g8/800/450',
-    caption: 'Wessam Abou Ali celebrates after scoring for Al Ahly in league action',
-    matchId: 4,
-    matchTitle: 'Al Ahly 2-1 Smouha',
-    date: '2026-04-11',
-  },
-  {
-    id: 'g9',
-    imageUrl: 'https://picsum.photos/seed/ahly-g9/800/450',
-    caption: 'Percy Tau in action for Al Ahly against Talaea El Gaish',
-    matchId: 6,
-    matchTitle: 'Talaea 1-2 Al Ahly',
-    date: '2026-03-09',
-  },
-  {
-    id: 'g10',
-    imageUrl: 'https://picsum.photos/seed/ahly-g10/800/450',
-    caption: 'Al Ahly team huddle before kickoff against El Gouna at home',
-    matchId: 9,
-    matchTitle: 'Al Ahly 1-0 El Gouna',
-    date: '2026-02-19',
-  },
+function generateCaption(match: Match): string {
+  const isAhlyHome = match.homeTeam.isAhly;
+  const ahlyScore = isAhlyHome ? match.homeScore : match.awayScore;
+  const oppScore = isAhlyHome ? match.awayScore : match.homeScore;
+  const opponent = isAhlyHome ? match.awayTeam.name : match.homeTeam.name;
+
+  if (ahlyScore == null) return `Upcoming: Al Ahly vs ${opponent} in ${match.competition.name}`;
+  if (ahlyScore > oppScore!) return `Al Ahly defeat ${opponent} ${ahlyScore}-${oppScore} in ${match.competition.name}`;
+  if (ahlyScore === oppScore) return `Al Ahly draw ${ahlyScore}-${ahlyScore} with ${opponent} in ${match.competition.name}`;
+  return `Al Ahly lose ${ahlyScore}-${oppScore} to ${opponent} in ${match.competition.name}`;
+}
+
+function generateMatchTitle(match: Match): string {
+  const isAhlyHome = match.homeTeam.isAhly;
+  const ahlyScore = match.homeScore;
+  const oppScore = match.awayScore;
+  const opponent = isAhlyHome ? match.awayTeam.name : match.homeTeam.name;
+  if (ahlyScore == null) return `Al Ahly vs ${opponent}`;
+  return isAhlyHome
+    ? `Al Ahly ${ahlyScore}-${oppScore} ${opponent}`
+    : `${opponent} ${oppScore}-${ahlyScore} Al Ahly`;
+}
+
+const galleryImagePool = [
+  'https://images.unsplash.com/photo-1459865264687-595d652de67e?w=800&q=80',
+  'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
+  'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80',
+  'https://images.unsplash.com/photo-1461896836934-bd45ba8fcf9b?w=800&q=80',
+  'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&q=80',
+  'https://images.unsplash.com/photo-1560272564-c83b4b0c7c5d?w=800&q=80',
+  'https://images.unsplash.com/photo-1431324155629-1a6deb1dec8d?w=800&q=80',
+  'https://images.unsplash.com/photo-1543326727-cf40c1a2efc5?w=800&q=80',
+  'https://images.unsplash.com/photo-1551959161-2e7f5f2c0adf?w=800&q=80',
+  'https://images.unsplash.com/photo-1504639725590-34d0984388bd?w=800&q=80',
 ];
+
+export function getMatchGallery(): MatchGalleryItem[] {
+  return recentMatches.map((match, index) => ({
+    id: `g-${match.id}`,
+    imageUrl: galleryImagePool[index % galleryImagePool.length],
+    caption: generateCaption(match),
+    matchId: match.id,
+    matchTitle: generateMatchTitle(match),
+    date: match.date,
+  }));
+}

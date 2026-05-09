@@ -11,19 +11,20 @@ import {
   History,
   Satellite,
 } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 const basePath = import.meta.env.BASE_URL;
 
 const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/matches', icon: Calendar, label: 'Matches' },
-  { to: '/standings', icon: Trophy, label: 'Standings' },
-  { to: '/history', icon: History, label: 'History' },
-  { to: '/news', icon: Newspaper, label: 'News' },
-  { to: '/media', icon: Camera, label: 'Media' },
-  { to: '/live', icon: Tv, label: 'Live' },
-  { to: '/live-tv', icon: Satellite, label: 'Live TV' },
-  { to: '/squad', icon: Users, label: 'Squad' },
+  { to: '/', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
+  { to: '/matches', icon: Calendar, labelKey: 'nav.matches' },
+  { to: '/standings', icon: Trophy, labelKey: 'nav.standings' },
+  { to: '/history', icon: History, labelKey: 'nav.history' },
+  { to: '/news', icon: Newspaper, labelKey: 'nav.news' },
+  { to: '/media', icon: Camera, labelKey: 'nav.media' },
+  { to: '/live', icon: Tv, labelKey: 'nav.live' },
+  { to: '/live-tv', icon: Satellite, labelKey: 'nav.liveTv' },
+  { to: '/squad', icon: Users, labelKey: 'nav.squad' },
 ];
 
 interface SidebarProps {
@@ -32,6 +33,7 @@ interface SidebarProps {
 }
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
+  const { t } = useLanguage();
   return (
     <>
       {isOpen && (
@@ -71,7 +73,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 onClick={onClose}
               >
                 <item.icon className="w-5 h-5" />
-                <span className="font-medium">{item.label}</span>
+                <span className="font-medium">{t(item.labelKey)}</span>
               </NavLink>
             ))}
           </nav>
@@ -83,7 +85,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
               onClick={onClose}
             >
               <Settings className="w-5 h-5" />
-              <span className="font-medium">Settings</span>
+              <span className="font-medium">{t('nav.settings')}</span>
             </NavLink>
           </div>
 

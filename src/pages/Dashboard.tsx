@@ -25,6 +25,7 @@ import LiveScoreTicker from '../components/LiveScoreTicker';
 import MatchGallery from '../components/MatchGallery';
 import { useNotifications } from '../hooks/useNotifications';
 import { useToast } from '../context/ToastContext';
+import { useLanguage } from '../context/LanguageContext';
 import { getRecentMatches, getUpcomingMatches, getLiveMatch, getStandings, getTeamStats } from '../services/api';
 import { Match, Standing, TeamStats, MatchEvent } from '../types';
 
@@ -41,6 +42,7 @@ export default function Dashboard() {
   const livePollingRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const { requestPermission, notify } = useNotifications();
   const { addToast } = useToast();
+  const { t } = useLanguage();
   const [dashboardEventIndex, setDashboardEventIndex] = useState(0);
 
   useEffect(() => {
@@ -140,7 +142,7 @@ export default function Dashboard() {
           }`}
         >
           {notificationsOn ? <Bell className="w-3.5 h-3.5" /> : <BellOff className="w-3.5 h-3.5" />}
-          {notificationsOn ? 'Notifications On' : 'Enable Alerts'}
+          {notificationsOn ? t('dashboard.notificationsOn') : t('dashboard.enableAlerts')}
         </button>
       </div>
 
@@ -162,30 +164,30 @@ export default function Dashboard() {
         <div ref={statsRef} className="grid grid-cols-2 md:grid-cols-4 gap-3 stagger-fade">
           <StatBox
             icon={<Trophy className="w-5 h-5 text-ahly-gold" />}
-            label="League Position"
+            label={t('dashboard.leaguePosition')}
             value={`#${ahlyStanding.position}`}
-            sub={`${ahlyStanding.points} pts`}
+            sub={`${ahlyStanding.points} ${t('dashboard.pts')}`}
             animate={animatedStats}
           />
           <StatBox
             icon={<Flame className="w-5 h-5 text-green-400" />}
-            label="Win Rate"
+            label={t('dashboard.winRate')}
             value={`${Math.round((stats.wins / stats.totalMatches) * 100)}%`}
             sub={`${stats.wins}W ${stats.draws}D ${stats.losses}L`}
             animate={animatedStats}
           />
           <StatBox
             icon={<Target className="w-5 h-5 text-ahly-red" />}
-            label="Top Scorer"
+            label={t('dashboard.topScorer')}
             value={stats.topScorer.name.split(' ').pop()!}
-            sub={`${stats.topScorer.goals} goals`}
+            sub={`${stats.topScorer.goals} ${t('dashboard.goals')}`}
             animate={animatedStats}
           />
           <StatBox
             icon={<Shield className="w-5 h-5 text-blue-400" />}
-            label="Clean Sheets"
+            label={t('dashboard.cleanSheets')}
             value={String(stats.cleanSheets)}
-            sub={`${stats.goalsConceded} conceded`}
+            sub={`${stats.goalsConceded} ${t('dashboard.conceded')}`}
             animate={animatedStats}
           />
         </div>
@@ -193,14 +195,14 @@ export default function Dashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <SectionHeader title="Recent Results" icon={<Flame />} link="/matches" />
+          <SectionHeader title={t('dashboard.recentResults')} icon={<Flame />} link="/matches" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 stagger-fade">
             {recentMatches.slice(0, 4).map((match) => (
               <MatchCard key={match.id} match={match} compact />
             ))}
           </div>
 
-          <SectionHeader title="Upcoming Fixtures" icon={<Swords />} link="/matches" />
+          <SectionHeader title={t('dashboard.upcomingFixtures')} icon={<Swords />} link="/matches" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 stagger-fade">
             {upcoming.slice(0, 4).map((match) => (
               <MatchCard key={match.id} match={match} compact />
@@ -209,7 +211,7 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-6">
-          <SectionHeader title="League Table" icon={<Trophy />} link="/standings" />
+          <SectionHeader title={t('dashboard.leagueTable')} icon={<Trophy />} link="/standings" />
           <div className="glass-card-elevated p-3">
             <StandingsTable standings={standingsData} compact />
           </div>
@@ -217,7 +219,7 @@ export default function Dashboard() {
       </div>
 
       <div>
-        <SectionHeader title="Latest Match Photos" icon={<Camera />} link="/media" />
+        <SectionHeader title={t('dashboard.latestPhotos')} icon={<Camera />} link="/media" />
         <MatchGallery limit={10} />
       </div>
     </div>
@@ -288,6 +290,7 @@ function SectionHeader({
   icon: React.ReactNode;
   link: string;
 }) {
+  const { t } = useLanguage();
   return (
     <div className="flex items-center justify-between">
       <h2 className="section-title">
@@ -298,13 +301,14 @@ function SectionHeader({
         to={link}
         className="flex items-center gap-1 text-xs text-ahly-red hover:text-ahly-gold transition-colors"
       >
-        View All <ChevronRight className="w-3.5 h-3.5" />
+        {t('dashboard.viewAll')} <ChevronRight className="w-3.5 h-3.5" />
       </Link>
     </div>
   );
 }
 
 function NextMatchHero({ match: nextMatch }: { match: Match }) {
+  const { t } = useLanguage();
   const tickerItems = [
     { text: nextMatch.competition.name, icon: '🏆' },
     { text: nextMatch.venue || 'Venue TBD', icon: '📍' },
@@ -320,7 +324,7 @@ function NextMatchHero({ match: nextMatch }: { match: Match }) {
   }, []);
 
   return (
-    <div className="bg-gradient-to-br from-ahly-red/15 via-ahly-card to-ahly-dark border border-ahly-red/30 rounded-2xl p-6 md:p-8 relative overflow-hidden h-full hover:border-ahly-red/50 transition-all group">
+    <div className="bg-gradient-to-br from-ahly-red/15 via-ahly-card to-ahly-dark border border-ahly-red/30 rounded-2xl p-6 md:p-8 relative overflow-hidden h-full hover:border-ahly-red/50 transition-all group animate-pulse-glow">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-20 -right-20 w-80 h-80 opacity-[0.06] animate-float-slow">
           <img src={`${import.meta.env.BASE_URL}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
@@ -343,7 +347,7 @@ function NextMatchHero({ match: nextMatch }: { match: Match }) {
                 <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-ahly-gold" />
               </span>
               <span className="text-sm text-ahly-gold font-bold tracking-wide uppercase" style={{textShadow: '0 0 10px rgba(212,175,55,0.3)'}}>
-                Next Match
+                {t('dashboard.nextMatch')}
               </span>
             </div>
           </div>
@@ -373,9 +377,9 @@ function NextMatchHero({ match: nextMatch }: { match: Match }) {
 
           <div className="flex flex-col items-center gap-1">
             <div className="w-12 h-12 md:w-14 md:h-14 rounded-full bg-gradient-to-br from-ahly-red/30 to-ahly-gold/20 border border-ahly-red/30 flex items-center justify-center animate-glow">
-              <span className="text-base md:text-lg font-black text-white">VS</span>
+              <span className="text-base md:text-lg font-black text-white">{t('common.vs')}</span>
             </div>
-            <span className="text-[10px] text-white/40 uppercase tracking-widest font-medium">Matchup</span>
+            <span className="text-[10px] text-white/40 uppercase tracking-widest font-medium">{t('dashboard.matchup')}</span>
           </div>
 
           <div className="flex flex-col items-center gap-3 min-w-0">
@@ -414,6 +418,7 @@ function NextMatchHero({ match: nextMatch }: { match: Match }) {
 }
 
 function LiveMatchCard({ match, eventIndex: _ei }: { match: Match; eventIndex: number }) {
+  const { t } = useLanguage();
   const isAhlyHome = match.homeTeam.isAhly;
   const ahlyScore = isAhlyHome ? match.homeScore : match.awayScore;
   const oppScore = isAhlyHome ? match.awayScore : match.homeScore;
@@ -434,7 +439,7 @@ function LiveMatchCard({ match, eventIndex: _ei }: { match: Match; eventIndex: n
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-2 w-2 bg-red-500" />
             </span>
-            <span className="text-xs font-bold text-red-400 tracking-wide">LIVE</span>
+            <span className="text-xs font-bold text-red-400 tracking-wide">{t('common.live')}</span>
             {match.minute && (
               <span className="text-xs font-bold text-white tabular-nums bg-red-500/20 px-1.5 py-0.5 rounded">
                 {match.minute}&apos;
@@ -458,7 +463,7 @@ function LiveMatchCard({ match, eventIndex: _ei }: { match: Match; eventIndex: n
                 <span className="truncate">{event.player}</span>
               </span>
             ) : (
-              <span className="text-ahly-muted/40">No events yet</span>
+              <span className="text-ahly-muted/40">{t('header.noEvents')}</span>
             )}
             {events.length > 1 && (
               <span className="text-[10px] text-ahly-muted/30 ml-auto shrink-0">{_ei + 1}/{events.length}</span>
@@ -468,7 +473,7 @@ function LiveMatchCard({ match, eventIndex: _ei }: { match: Match; eventIndex: n
           <div className="flex items-center justify-between text-[11px] border-t border-white/10 pt-3">
             <span className="text-ahly-muted/60 font-medium">{match.competition.name}</span>
             <span className="flex items-center gap-1 text-ahly-red group-hover:gap-1.5 transition-all font-medium">
-              Watch <ChevronRight className="w-3.5 h-3.5" />
+              {t('header.watch')} <ChevronRight className="w-3.5 h-3.5" />
             </span>
           </div>
         </div>
@@ -478,6 +483,7 @@ function LiveMatchCard({ match, eventIndex: _ei }: { match: Match; eventIndex: n
 }
 
 function LiveWaitingCard({ match }: { match?: Match }) {
+  const { t } = useLanguage();
   const [timeLeft, setTimeLeft] = useState({ d: 0, h: 0, m: 0, s: 0 });
 
   useEffect(() => {
@@ -509,14 +515,14 @@ function LiveWaitingCard({ match }: { match?: Match }) {
           <>
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-ahly-gold" />
-              <span className="text-xs text-ahly-gold font-bold tracking-wide uppercase">Next Match</span>
+              <span className="text-xs text-ahly-gold font-bold tracking-wide uppercase">{t('dashboard.nextMatch')}</span>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-ahly-dark/70 border border-ahly-red/30 flex items-center justify-center p-1">
                 <LogoImage src={match.homeTeam.logo} name={match.homeTeam.name} isAhly={true} className="w-full h-full" />
               </div>
-              <span className="text-xs text-ahly-muted font-medium">vs</span>
+              <span className="text-xs text-ahly-muted font-medium">{t('common.vs')}</span>
               <div className={`w-10 h-10 rounded-full bg-ahly-dark/70 border flex items-center justify-center p-1 ${match.awayTeam.isAhly ? 'border-ahly-red/30' : 'border-ahly-gold/20'}`}>
                 <LogoImage src={match.awayTeam.logo} name={match.awayTeam.name} isAhly={match.awayTeam.isAhly} className="w-full h-full" />
               </div>
@@ -548,7 +554,7 @@ function LiveWaitingCard({ match }: { match?: Match }) {
             </div>
 
             <p className="text-[10px] text-ahly-muted/50 text-center">
-              Match starts soon &mdash; live events will appear here automatically
+              {t('dashboard.matchStartsSoon')}
             </p>
           </>
         ) : (
@@ -557,8 +563,8 @@ function LiveWaitingCard({ match }: { match?: Match }) {
               <Clock className="w-6 h-6 text-ahly-muted/50" />
             </div>
             <div className="text-center">
-              <p className="text-sm text-ahly-muted font-medium">No Live Matches</p>
-              <p className="text-[10px] text-ahly-muted/50 mt-1">Waiting for the next match to begin</p>
+              <p className="text-sm text-ahly-muted font-medium">{t('dashboard.noLiveMatches')}</p>
+              <p className="text-[10px] text-ahly-muted/50 mt-1">{t('dashboard.waitingForMatch')}</p>
             </div>
           </>
         )}

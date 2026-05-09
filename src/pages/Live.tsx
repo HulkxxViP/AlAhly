@@ -16,10 +16,12 @@ import {
   RotateCcw,
 } from 'lucide-react';
 import MatchCard from '../components/MatchCard';
+import { useLanguage } from '../context/LanguageContext';
 import { getLiveMatch, getUpcomingMatches, getAllStreams } from '../services/api';
 import { Match, StreamSource } from '../types';
 
 export default function Live() {
+  const { t } = useLanguage();
   const [liveMatch, setLiveMatch] = useState<Match | null>(null);
   const [nextMatch, setNextMatch] = useState<Match | null>(null);
   const [loading, setLoading] = useState(true);
@@ -97,7 +99,7 @@ export default function Live() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <Tv className="w-7 h-7 text-ahly-red" />
-            <h1 className="page-header mb-0">Live & Streaming</h1>
+<h1 className="page-header mb-0">{t('live.liveStreaming')}</h1>
           </div>
         </div>
         <div className="skeleton h-48 w-full rounded-2xl mb-6" />
@@ -127,7 +129,7 @@ export default function Live() {
             }`}
           >
             <RotateCcw className="w-3.5 h-3.5" />
-            Auto
+            {t('live.auto')}
           </button>
           <button
             onClick={handleManualRefresh}
@@ -135,7 +137,7 @@ export default function Live() {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-ahly-card text-ahly-muted hover:text-white border border-ahly-border transition-all text-xs font-medium disabled:opacity-50"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            {t('live.refresh')}
           </button>
         </div>
       </div>
@@ -147,7 +149,7 @@ export default function Live() {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
               <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
             </span>
-            <h2 className="text-lg font-bold text-red-400 animate-glow-red">Match In Progress</h2>
+            <h2 className="text-lg font-bold text-red-400 animate-glow-red">{t('live.matchInProgress')}</h2>
           </div>
           <div className="max-w-xl">
             <MatchCard match={liveMatch} />
@@ -161,10 +163,10 @@ export default function Live() {
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-2">
               <Clock className="w-5 h-5 text-ahly-muted" />
-              <span className="text-sm text-ahly-muted">No Live Match Right Now</span>
+              <span className="text-sm text-ahly-muted">{t('live.noLiveMatch')}</span>
             </div>
             <h2 className="text-lg font-semibold text-white mb-4">
-              Next match: {nextMatch.homeTeam.name} vs {nextMatch.awayTeam.name}
+              {t('live.nextMatch')}: {nextMatch.homeTeam.name} vs {nextMatch.awayTeam.name}
             </h2>
             <div className="max-w-xl">
               <MatchCard match={nextMatch} compact />
@@ -174,8 +176,8 @@ export default function Live() {
       ) : (
         <div className="glass-card-elevated p-8 text-center mb-6">
           <WifiOff className="w-12 h-12 text-ahly-muted mx-auto mb-3" />
-          <h2 className="text-lg font-semibold text-white mb-1">No Upcoming Matches</h2>
-          <p className="text-sm text-ahly-muted">Check back later for live match updates.</p>
+          <h2 className="text-lg font-semibold text-white mb-1">{t('live.noUpcoming')}</h2>
+          <p className="text-sm text-ahly-muted">{t('live.checkBack')}</p>
         </div>
       )}
 
@@ -237,7 +239,7 @@ export default function Live() {
               className="flex items-center gap-1 text-xs text-ahly-red hover:text-ahly-gold transition-colors"
             >
               <ExternalLink className="w-3 h-3" />
-              Open in new tab
+              {t('live.openNewTab')}
             </a>
           </div>
         </div>
@@ -245,30 +247,30 @@ export default function Live() {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 stagger-fade">
         <StreamSection
-          title="Official Channels"
+          title={t('live.officialChannels')}
           icon={<Star className="w-4 h-4 text-ahly-gold" />}
           streams={officialStreams}
           selected={selectedStream}
           onSelect={handleStreamSelect}
-          badge="Official"
+          badge={t('live.official')}
           badgeClass="bg-ahly-gold/20 text-ahly-gold"
         />
         <StreamSection
-          title="Free Streams"
+          title={t('live.freeStreams')}
           icon={<Zap className="w-4 h-4 text-green-400" />}
           streams={freeStreams}
           selected={selectedStream}
           onSelect={handleStreamSelect}
-          badge="Free"
+          badge={t('live.free')}
           badgeClass="bg-green-500/20 text-green-400"
         />
         <StreamSection
-          title="Premium"
+          title={t('live.premium')}
           icon={<Wifi className="w-4 h-4 text-purple-400" />}
           streams={premiumStreams}
           selected={selectedStream}
           onSelect={handleStreamSelect}
-          badge="Premium"
+          badge={t('live.premium')}
           badgeClass="bg-purple-500/20 text-purple-400"
         />
       </div>
@@ -276,11 +278,11 @@ export default function Live() {
       <div className="mt-8 glass-card-elevated p-5">
         <div className="flex items-center gap-2 mb-3">
           <Radio className="w-4 h-4 text-ahly-red" />
-          <h3 className="text-sm font-semibold text-white">How to Watch Al Ahly Matches</h3>
+          <h3 className="text-sm font-semibold text-white">{t('live.howToWatch')}</h3>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-ahly-muted">
           <div>
-            <h4 className="text-white font-medium mb-1">In Egypt</h4>
+            <h4 className="text-white font-medium mb-1">{t('live.inEgypt')}</h4>
             <ul className="space-y-1">
               <li>- OnTime Sports (Free-to-air for Egyptian League)</li>
               <li>- beIN Sports (CAF Champions League)</li>
@@ -289,7 +291,7 @@ export default function Live() {
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-medium mb-1">Free Online</h4>
+            <h4 className="text-white font-medium mb-1">{t('live.freeOnline')}</h4>
             <ul className="space-y-1">
               <li>- Yalla Shoot (Arabic commentary)</li>
               <li>- Koora Live (HD streams)</li>
@@ -320,6 +322,7 @@ function StreamSection({
   badge: string;
   badgeClass: string;
 }) {
+  const { t } = useLanguage();
   return (
     <div className="glass-card-elevated p-5">
       <h3 className="text-sm font-semibold text-white mb-4 flex items-center gap-2">
@@ -357,7 +360,7 @@ function StreamSection({
                 </div>
               </div>
               <span className={`badge ${isActive ? 'bg-ahly-red/20 text-ahly-red' : badgeClass}`}>
-                {isActive ? 'Playing' : badge}
+                {isActive ? t('live.playing') : badge}
               </span>
             </button>
           );

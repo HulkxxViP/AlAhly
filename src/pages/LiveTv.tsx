@@ -13,6 +13,7 @@ import {
   Tv,
 } from 'lucide-react';
 import Hls from 'hls.js';
+import { useLanguage } from '../context/LanguageContext';
 import { TVChannel } from '../types';
 import { getChannels } from '../data/tvChannels';
 import { syncChannelsFromIPTV, shouldSync } from '../services/tvService';
@@ -27,6 +28,7 @@ const categoryTabs: { key: CategoryTab; label: string }[] = [
 ];
 
 export default function LiveTv() {
+  const { t } = useLanguage();
   const [channels, setChannels] = useState<TVChannel[]>([]);
   const [loading, setLoading] = useState(true);
   const [syncing, setSyncing] = useState(false);
@@ -83,7 +85,7 @@ export default function LiveTv() {
       <div className="page-enter">
         <div className="flex items-center gap-3 mb-6">
           <Satellite className="w-7 h-7 text-ahly-red" />
-          <h1 className="page-header mb-0">Live TV Channels</h1>
+          <h1 className="page-header mb-0">{t('liveTv.title')}</h1>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {Array.from({ length: 8 }).map((_, i) => (
@@ -105,7 +107,7 @@ export default function LiveTv() {
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Satellite className="w-7 h-7 text-ahly-red" />
-          <h1 className="page-header mb-0">Live TV Channels</h1>
+          <h1 className="page-header mb-0">{t('liveTv.title')}</h1>
         </div>
         <div className="flex items-center gap-2">
           <button

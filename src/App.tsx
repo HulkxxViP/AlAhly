@@ -14,6 +14,7 @@ import Media from './pages/Media';
 import HistoryPage from './pages/History';
 import MusicPlayer from './components/MusicPlayer';
 import AppFooter from './components/AppFooter';
+import ScrollArrows from './components/ScrollArrows';
 import { ToastProvider } from './context/ToastContext';
 
 export default function App() {
@@ -48,6 +49,7 @@ export default function App() {
         </div>
 
         <MusicPlayer />
+        <ScrollArrows />
       </div>
     </ToastProvider>
   );
