@@ -14,6 +14,7 @@ import {
 import { useLanguage } from '../context/LanguageContext';
 
 const basePath = import.meta.env.BASE_URL;
+const OFFICIAL_LOGO = 'https://alahlyegypt.com/_next/image?url=%2Flogo.png&w=320&q=75';
 
 const navItems = [
   { to: '/', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
@@ -52,7 +53,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
           <div className="p-4 border-b border-ahly-border/50">
             <div className="flex items-center gap-3">
               <img
-                src={`${basePath}ahly-logo.png`}
+                src={OFFICIAL_LOGO}
                 alt="Al Ahly SC"
                 className="w-12 h-12 animate-float-slow"
               />
@@ -91,10 +92,10 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
 
           <div className="p-4 mx-3 mb-3 ahly-gradient-subtle rounded-lg border border-ahly-red/20 text-center relative overflow-hidden">
             <div className="absolute -top-4 -right-4 w-20 h-20 opacity-[0.04]">
-              <img src={`${basePath}ahly-logo.png`} alt="" className="w-full h-full object-contain" />
+              <img src={OFFICIAL_LOGO} alt="" className="w-full h-full object-contain" />
             </div>
             <img
-              src={`${basePath}ahly-logo.png`}
+              src={OFFICIAL_LOGO}
               alt="Al Ahly SC"
               className="w-16 h-16 mx-auto mb-2 opacity-80 animate-float"
             />

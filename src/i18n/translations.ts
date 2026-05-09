@@ -109,6 +109,11 @@ export const translations: Record<Lang, Record<string, string>> = {
 
     'history.title': 'History',
 
+    'football.more': 'More',
+    'football.schedule': 'Matches Schedule',
+    'football.results': 'Match Results',
+    'football.firstTeam': 'Football First Team',
+
     'common.next': 'Next',
     'common.live': 'LIVE',
     'common.win': 'Win',
@@ -223,6 +228,11 @@ export const translations: Record<Lang, Record<string, string>> = {
     'liveTv.title': 'القنوات التلفزيونية المباشرة',
 
     'history.title': 'التاريخ',
+
+    'football.more': 'المزيد',
+    'football.schedule': 'جدول المباريات',
+    'football.results': 'نتائج المباريات',
+    'football.firstTeam': 'الفريق الأول لكرة القدم',
 
     'common.next': 'التالي',
     'common.live': 'مباشر',

@@ -7,6 +7,7 @@ import { Match, MatchEvent } from '../types';
 import { useLanguage } from '../context/LanguageContext';
 
 const basePath = import.meta.env.BASE_URL;
+const OFFICIAL_LOGO = 'https://alahlyegypt.com/_next/image?url=%2Flogo.png&w=320&q=75';
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -176,7 +177,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </button>
 
           <div className="lg:hidden flex items-center gap-2">
-            <img src={`${basePath}ahly-logo.png`} alt="Al Ahly" className="w-8 h-8" />
+            <img src={OFFICIAL_LOGO} alt="Al Ahly" className="w-8 h-8" />
             <span className="text-sm font-bold text-white">Al Ahly Tracker</span>
           </div>
 
@@ -268,7 +269,7 @@ export default function Header({ onMenuClick }: HeaderProps) {
           </button>
 
           <div className="w-8 h-8 rounded-full overflow-hidden border-2 border-ahly-red/50">
-            <img src={`${basePath}ahly-logo.png`} alt="Al Ahly" className="w-full h-full" />
+            <img src={OFFICIAL_LOGO} alt="Al Ahly" className="w-full h-full" />
           </div>
         </div>
       </div>
