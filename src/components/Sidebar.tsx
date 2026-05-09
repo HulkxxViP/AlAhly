@@ -10,6 +10,7 @@ import {
   Settings,
   History,
   Satellite,
+  Award,
 } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 
@@ -20,6 +21,7 @@ const navItems = [
   { to: '/', icon: LayoutDashboard, labelKey: 'nav.dashboard' },
   { to: '/matches', icon: Calendar, labelKey: 'nav.matches' },
   { to: '/standings', icon: Trophy, labelKey: 'nav.standings' },
+  { to: '/trophies', icon: Award, labelKey: 'nav.trophies' },
   { to: '/history', icon: History, labelKey: 'nav.history' },
   { to: '/news', icon: Newspaper, labelKey: 'nav.news' },
   { to: '/media', icon: Camera, labelKey: 'nav.media' },

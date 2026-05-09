@@ -1,40 +1,40 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { ChevronLeft, ChevronRight, Pause, Play, ShirtIcon } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, ShirtIcon, Pause, Play } from 'lucide-react';
 import { squad } from '../data/mockData';
 
 function getAvatarUrl(name: string): string {
-  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=991b1b&color=fff&size=256&bold=true&format=svg`;
+  return `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=1a0000&color=fff&size=256&bold=true&format=svg`;
 }
 
-const positionBadgeColors: Record<string, string> = {
-  Goalkeeper: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
-  Defender: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
-  Midfielder: 'bg-green-500/20 text-green-400 border-green-500/30',
-  Forward: 'bg-ahly-red/20 text-ahly-red border-ahly-red/30',
-};
-
 const POSITIONS = ['Goalkeeper', 'Defender', 'Midfielder', 'Forward'] as const;
+
+const positionColors: Record<string, string> = {
+  Goalkeeper: 'from-yellow-500/30 to-yellow-600/10',
+  Defender: 'from-blue-500/30 to-blue-600/10',
+  Midfielder: 'from-green-500/30 to-green-600/10',
+  Forward: 'from-ahly-red/30 to-ahly-darkRed/10',
+};
 
 export default function PlayerRotation() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
   const [filter, setFilter] = useState<string>('All');
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   const filteredSquad = filter === 'All'
     ? squad
     : squad.filter((p) => p.position === filter);
 
   const safeIndex = currentIndex >= filteredSquad.length ? 0 : currentIndex;
-  const currentPlayer = filteredSquad[safeIndex];
 
   const next = useCallback(() => {
     if (filteredSquad.length === 0) return;
     setCurrentIndex((prev) => (prev + 1) % filteredSquad.length);
   }, [filteredSquad.length]);
 
-  const prevHandler = useCallback(() => {
+  const prev = useCallback(() => {
     if (filteredSquad.length === 0) return;
     setCurrentIndex((prev) => (prev - 1 + filteredSquad.length) % filteredSquad.length);
   }, [filteredSquad.length]);
@@ -48,16 +48,24 @@ export default function PlayerRotation() {
   useEffect(() => {
     if (isPaused || filteredSquad.length <= 1) return;
     intervalRef.current = setInterval(next, 3000);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
   }, [isPaused, next, filteredSquad.length]);
 
   useEffect(() => {
-    if (safeIndex !== currentIndex) {
-      setCurrentIndex(safeIndex);
-    }
-  }, [filter, safeIndex]);
+    if (safeIndex !== currentIndex) setCurrentIndex(safeIndex);
+  }, [filter]);
+
+  const getVisiblePlayers = () => {
+    const len = filteredSquad.length;
+    if (len === 0) return [];
+    const prev2 = (safeIndex - 2 + len) % len;
+    const prev1 = (safeIndex - 1 + len) % len;
+    const next1 = (safeIndex + 1) % len;
+    const next2 = (safeIndex + 2) % len;
+    return [prev2, prev1, safeIndex, next1, next2];
+  };
+
+  const visibleIndices = getVisiblePlayers();
 
   return (
     <div className="space-y-4">
@@ -66,21 +74,16 @@ export default function PlayerRotation() {
           <ShirtIcon className="w-5 h-5 text-ahly-red" />
           Players
         </h3>
-        <Link
-          to="/players"
-          className="text-xs text-ahly-red hover:text-ahly-gold transition-colors flex items-center gap-1"
-        >
+        <Link to="/squad" className="text-xs text-ahly-red hover:text-ahly-gold transition-colors flex items-center gap-1">
           View All <ChevronRight className="w-3 h-3" />
         </Link>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-2">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => { setFilter('All'); setCurrentIndex(0); }}
           className={`px-4 py-1.5 rounded text-xs font-semibold transition-all ${
-            filter === 'All'
-              ? 'bg-ahly-red text-white'
-              : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+            filter === 'All' ? 'bg-ahly-red text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
           }`}
         >
           All
@@ -90,9 +93,7 @@ export default function PlayerRotation() {
             key={pos}
             onClick={() => { setFilter(pos); setCurrentIndex(0); }}
             className={`px-4 py-1.5 rounded text-xs font-semibold transition-all ${
-              filter === pos
-                ? 'bg-ahly-red text-white'
-                : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
+              filter === pos ? 'bg-ahly-red text-white' : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
             }`}
           >
             {pos}
@@ -101,113 +102,139 @@ export default function PlayerRotation() {
       </div>
 
       <div
-        className="relative w-full h-[340px] rounded-2xl overflow-hidden bg-gradient-to-br from-ahly-dark via-ahly-card to-ahly-dark border border-white/5 group"
+        ref={containerRef}
+        className="relative w-full h-[380px] rounded-2xl overflow-hidden group select-none"
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        {filteredSquad.map((player, i) => (
-          <div
-            key={player.id}
-            className={`absolute inset-0 transition-all duration-700 ease-in-out ${
-              i === safeIndex
-                ? 'opacity-100 scale-100'
-                : 'opacity-0 scale-105 pointer-events-none'
-            }`}
-          >
-            <div className="absolute inset-0">
-              <img
-                src={player.photo || getAvatarUrl(player.name)}
-                alt={player.name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  const img = e.target as HTMLImageElement;
-                  if (!img.dataset.fallback) {
-                    img.dataset.fallback = 'true';
-                    img.src = getAvatarUrl(player.name);
-                  }
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
-            </div>
+        {/* Smoky dark background with gradient */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0000] via-[#1a0505] to-[#0a0000]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(100,10,10,0.15)_0%,transparent_70%)]" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom,rgba(200,16,46,0.05)_0%,transparent_50%)]" />
 
-            <div className="absolute bottom-0 left-0 right-0 p-6 md:p-8">
-              <div className="flex items-end justify-between">
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-6xl md:text-7xl font-black text-white/10 leading-none">
+        {/* Ambient light glow on sides */}
+        <div className="absolute top-0 left-0 w-32 h-full bg-gradient-to-r from-[#0a0000] via-[#1a0505]/80 to-transparent z-10 pointer-events-none" />
+        <div className="absolute top-0 right-0 w-32 h-full bg-gradient-to-l from-[#0a0000] via-[#1a0505]/80 to-transparent z-10 pointer-events-none" />
+
+        {/* Player carousel */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          {filteredSquad.length > 0 && visibleIndices.map((playerIdx, position) => {
+            const player = filteredSquad[playerIdx];
+            if (!player) return null;
+            const isCenter = playerIdx === safeIndex;
+            const isAdjacent =
+              playerIdx === (safeIndex - 1 + filteredSquad.length) % filteredSquad.length ||
+              playerIdx === (safeIndex + 1) % filteredSquad.length;
+
+            return (
+              <div
+                key={`${player.id}-${position}`}
+                className={`absolute transition-all duration-700 ease-in-out ${
+                  isCenter
+                    ? 'z-20 scale-100 opacity-100'
+                    : isAdjacent
+                      ? 'z-10 scale-75 opacity-40 blur-[1px]'
+                      : 'z-0 scale-50 opacity-0 pointer-events-none'
+                }`}
+                style={{
+                  transform: isCenter
+                    ? 'translateX(0) scale(1)'
+                    : isAdjacent && playerIdx === (safeIndex - 1 + filteredSquad.length) % filteredSquad.length
+                      ? 'translateX(-42%) scale(0.75)'
+                      : isAdjacent
+                        ? 'translateX(42%) scale(0.75)'
+                        : 'translateX(0) scale(0.5)',
+                }}
+              >
+                {/* Player card */}
+                <div className="relative flex flex-col items-center">
+                  {/* Player image */}
+                  <div className={`relative ${isCenter ? 'w-52 h-60 md:w-64 md:h-72' : 'w-36 h-44 md:w-44 md:h-52'} overflow-hidden rounded-2xl`}>
+                    <img
+                      src={player.photo || getAvatarUrl(player.name)}
+                      alt={player.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const img = e.target as HTMLImageElement;
+                        if (!img.dataset.fallback) {
+                          img.dataset.fallback = 'true';
+                          img.src = getAvatarUrl(player.name);
+                        }
+                      }}
+                    />
+                    {/* Bottom fade */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+
+                    {/* Jersey number */}
+                    <span className={`absolute ${isCenter ? 'top-3 left-3' : 'top-2 left-2'} font-black text-white/10 leading-none select-none ${isCenter ? 'text-7xl' : 'text-4xl'}`}>
                       {String(player.number).padStart(2, '0')}
                     </span>
-                    <span
-                      className={`px-3 py-1 rounded-full text-xs font-bold border ${positionBadgeColors[player.position] || 'bg-ahly-card text-ahly-muted border-ahly-border'}`}
-                    >
+
+                    {/* Position badge */}
+                    <span className={`absolute ${isCenter ? 'top-3 right-3' : 'top-2 right-2'} px-2.5 py-1 rounded-full text-[10px] font-bold text-white/70 border border-white/10 bg-black/40 backdrop-blur-sm`}>
                       {player.position}
                     </span>
                   </div>
-                  <h4 className="text-2xl md:text-3xl font-bold text-white">
-                    {player.name}
-                  </h4>
-                  {player.nameAr && (
-                    <p className="text-lg text-white/60" dir="rtl">
-                      {player.nameAr}
+
+                  {/* Player info */}
+                  <div className={`text-center mt-3 ${isCenter ? '' : 'hidden'}`}>
+                    <h4 className="text-xl md:text-2xl font-bold text-ahly-gold tracking-wide" style={{textShadow: '0 0 20px rgba(212,175,55,0.3)'}}>
+                      {player.name}
+                    </h4>
+                    <p className="text-sm text-white/60 mt-0.5 font-medium tracking-wider uppercase">
+                      #{player.number} · {player.position}
                     </p>
-                  )}
-                  <div className="flex items-center gap-3 mt-2 text-sm text-white/50">
-                    <span>{player.nationality}</span>
-                    <span className="w-1 h-1 rounded-full bg-white/30" />
-                    <span>Age: {player.age}</span>
-                    <span className="w-1 h-1 rounded-full bg-white/30" />
-                    <span>{player.appearances} Apps</span>
                   </div>
                 </div>
-
-                {player.photo && (
-                  <img
-                    src={player.photo}
-                    alt=""
-                    className="hidden md:block w-28 h-28 rounded-2xl object-cover border-2 border-white/10 shadow-2xl"
-                  />
-                )}
               </div>
-            </div>
-          </div>
-        ))}
+            );
+          })}
+        </div>
 
+        {/* Empty state */}
+        {filteredSquad.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center text-white/30 text-sm">
+            No players found
+          </div>
+        )}
+
+        {/* Navigation arrows */}
         {filteredSquad.length > 1 && (
           <>
             <button
-              onClick={(e) => { e.stopPropagation(); prevHandler(); setIsPaused(true); setTimeout(() => setIsPaused(false), 6000); }}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all border border-white/10 hover:scale-110"
+              onClick={(e) => { e.stopPropagation(); prev(); setIsPaused(true); setTimeout(() => setIsPaused(false), 6000); }}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all border border-white/10 hover:scale-110 backdrop-blur-sm"
             >
               <ChevronLeft className="w-5 h-5" />
             </button>
             <button
               onClick={(e) => { e.stopPropagation(); next(); setIsPaused(true); setTimeout(() => setIsPaused(false), 6000); }}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all border border-white/10 hover:scale-110"
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-30 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all border border-white/10 hover:scale-110 backdrop-blur-sm"
             >
               <ChevronRight className="w-5 h-5" />
             </button>
           </>
         )}
 
-        <div className="absolute top-3 right-3">
+        {/* Pause button */}
+        <div className="absolute top-4 right-4 z-30">
           <button
             onClick={() => setIsPaused(!isPaused)}
-            className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white/70 hover:text-white flex items-center justify-center transition-all border border-white/10"
+            className="w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white/70 hover:text-white flex items-center justify-center transition-all border border-white/10 backdrop-blur-sm"
             title={isPaused ? 'Resume' : 'Pause'}
           >
             {isPaused ? <Play className="w-3.5 h-3.5" /> : <Pause className="w-3.5 h-3.5" />}
           </button>
         </div>
 
-        <div className="absolute bottom-3 right-6 flex gap-1.5">
-          {filteredSquad.map((_, i) => (
+        {/* Dot indicators */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex gap-1.5">
+          {filteredSquad.slice(0, Math.min(filteredSquad.length, 8)).map((_, i) => (
             <button
               key={i}
               onClick={() => goTo(i)}
               className={`transition-all rounded-full ${
-                i === safeIndex
-                  ? 'w-6 h-2 bg-ahly-gold'
-                  : 'w-2 h-2 bg-white/30 hover:bg-white/50'
+                i === safeIndex ? 'w-5 h-2 bg-ahly-gold' : 'w-2 h-2 bg-white/20 hover:bg-white/40'
               }`}
             />
           ))}

@@ -12,6 +12,7 @@ import Squad from './pages/Squad';
 import Settings from './pages/Settings';
 import Media from './pages/Media';
 import HistoryPage from './pages/History';
+import Trophies from './pages/Trophies';
 import MusicPlayer from './components/MusicPlayer';
 import AppFooter from './components/AppFooter';
 import ScrollArrows from './components/ScrollArrows';
@@ -39,6 +40,7 @@ export default function App() {
                 <Route path="/live" element={<Live />} />
                 <Route path="/live-tv" element={<LiveTv />} />
                 <Route path="/squad" element={<Squad />} />
+                <Route path="/trophies" element={<Trophies />} />
                 <Route path="/media" element={<Media />} />
                 <Route path="/settings" element={<Settings />} />
               </Routes>

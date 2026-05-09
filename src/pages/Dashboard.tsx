@@ -305,14 +305,24 @@ function SectionHeader({
   const { t } = useLanguage();
   return (
     <div className="flex items-center justify-between">
-      <h2 className="section-title">
-        {icon}
-        {title}
+      <h2 className="section-title relative">
+        <span className="relative flex w-2 h-2 mr-1">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ahly-red opacity-60" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-ahly-red" />
+        </span>
+        <span className="bg-gradient-to-r from-white via-white to-ahly-gold bg-clip-text text-transparent">
+          {icon}
+          {title}
+        </span>
       </h2>
       <Link
         to={link}
         className="flex items-center gap-1 text-xs text-ahly-red hover:text-ahly-gold transition-colors"
       >
+        <span className="relative flex w-1.5 h-1.5 mr-1">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-ahly-red opacity-60" />
+          <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-ahly-red" />
+        </span>
         {t('dashboard.viewAll')} <ChevronRight className="w-3.5 h-3.5" />
       </Link>
     </div>

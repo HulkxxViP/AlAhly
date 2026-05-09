@@ -10,6 +10,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.media': 'Media',
     'nav.live': 'Live & Streaming',
     'nav.liveTv': 'Live TV',
+    'nav.trophies': 'Trophies',
     'nav.squad': 'Squad',
     'nav.settings': 'Settings',
 
@@ -130,6 +131,7 @@ export const translations: Record<Lang, Record<string, string>> = {
     'nav.media': 'الصور',
     'nav.live': 'البث المباشر',
     'nav.liveTv': 'القنوات التلفزيونية',
+    'nav.trophies': 'البطولات',
     'nav.squad': 'الفريق',
     'nav.settings': 'الإعدادات',
 
