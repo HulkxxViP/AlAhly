@@ -1,19 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronRight, ChevronLeft, Clock, Calendar } from 'lucide-react';
-import { mockNews, upcomingMatches, recentMatches, AHLY_TEAM } from '../data/mockData';
+import { ChevronRight, ChevronLeft  } from 'lucide-react';
+import { AHLY_TEAM } from '../data/mockData';
 import { useLanguage } from '../context/LanguageContext';
-import CountdownTimer from './CountdownTimer';
+import PlayerRotation from './PlayerRotation';
 
 const OFFICIAL_LOGO = 'https://alahlyegypt.com/_next/image?url=%2Flogo.png&w=320&q=75';
-
-const newsCategories = [
-  { key: 'all', labelEn: 'All', labelAr: '????' },
-  { key: 'Football', labelEn: 'Football', labelAr: '??? ?????' },
-  { key: 'Youth Sector', labelEn: 'Youth Sector', labelAr: '???? ????????' },
-  { key: 'The Club', labelEn: 'The Club', labelAr: '??????' },
-  { key: 'Sports', labelEn: 'Sports', labelAr: '????????' },
-];
 
 const heroArticles = [
   {
@@ -40,22 +32,8 @@ const heroArticles = [
 ];
 
 export default function FootballFirstTeam() {
-  const { t, lang } = useLanguage();
+  const { t } = useLanguage();
   const [heroIndex, setHeroIndex] = useState(0);
-  const [activeCategory, setActiveCategory] = useState('all');
-
-  const filteredNews = activeCategory === 'all'
-    ? mockNews
-    : mockNews.filter(() => {
-        const categoryMap: Record<string, string> = {
-          'Football': 'match',
-          'Youth Sector': 'general',
-          'The Club': 'award',
-          'Sports': 'general',
-        };
-        const mappedCategory = categoryMap[activeCategory] || 'general';
-        return activeCategory === 'Football' ? true : false;
-      });
 
   const nextHero = () => setHeroIndex((prev) => (prev + 1) % heroArticles.length);
   const prevHero = () => setHeroIndex((prev) => (prev - 1 + heroArticles.length) % heroArticles.length);
@@ -68,7 +46,7 @@ export default function FootballFirstTeam() {
         </div>
         <div>
           <h2 className="text-xl md:text-2xl font-bold text-white">Football First Team</h2>
-          <p className="text-xs text-ahly-muted">Al Ahly SC — {t('dashboard.latestNews')}</p>
+          <p className="text-xs text-ahly-muted">Al Ahly SC ï¿½ {t('dashboard.latestNews')}</p>
         </div>
       </div>
 
@@ -127,56 +105,6 @@ export default function FootballFirstTeam() {
         </div>
       </div>
 
-      {/* Upcoming Matches Scroller */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <Calendar className="w-5 h-5 text-ahly-red" />
-            {t('dashboard.upcomingFixtures')}
-          </h3>
-          <Link to="/matches" className="text-xs text-ahly-red hover:text-ahly-gold transition-colors flex items-center gap-1">
-            {t('dashboard.viewAll')} <ChevronRight className="w-3 h-3" />
-          </Link>
-        </div>
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin">
-          {upcomingMatches.slice(0, 5).map((match) => (
-            <div
-              key={match.id}
-              className="min-w-[220px] bg-white rounded-xl shadow-md overflow-hidden flex-shrink-0"
-            >
-              <div className="bg-gradient-to-r from-ahly-red to-ahly-darkRed px-3 py-2">
-                <p className="text-white text-xs font-semibold text-center">
-                  {match.competition.name}
-                </p>
-              </div>
-              <div className="p-3">
-                <div className="flex justify-between items-center mb-3">
-                  <div className="flex flex-col items-center gap-1 flex-1">
-                    <div className="w-10 h-10 flex items-center justify-center">
-                      <img src={match.homeTeam.logo} alt={match.homeTeam.name} className="w-full h-full object-contain" onError={(e) => { (e.target as HTMLImageElement).src = OFFICIAL_LOGO; }} />
-                    </div>
-                    <span className="text-[10px] text-gray-600 font-medium text-center leading-tight">{match.homeTeam.name}</span>
-                  </div>
-                  <div className="flex flex-col items-center px-2">
-                    <span className="text-lg font-black text-ahly-red">vs</span>
-                    <span className="text-[10px] text-gray-400">{match.time}</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1 flex-1">
-                    <div className="w-10 h-10 flex items-center justify-center">
-                      <img src={match.awayTeam.logo} alt={match.awayTeam.name} className="w-full h-full object-contain" onError={(e) => { (e.target as HTMLImageElement).src = OFFICIAL_LOGO; }} />
-                    </div>
-                    <span className="text-[10px] text-gray-600 font-medium text-center leading-tight">{match.awayTeam.name}</span>
-                  </div>
-                </div>
-                <div className="text-center">
-                  <p className="text-xs text-gray-500">{match.date}</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Schedule / Results Buttons */}
       <div className="flex justify-center gap-4">
         <Link
@@ -193,74 +121,8 @@ export default function FootballFirstTeam() {
         </Link>
       </div>
 
-      {/* News Section */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="text-lg font-bold text-white flex items-center gap-2">
-            <span role="img" aria-label="news">??</span>
-            {t('news.latest')}
-          </h3>
-          <Link to="/news" className="text-xs text-ahly-red hover:text-ahly-gold transition-colors flex items-center gap-1">
-            More <ChevronRight className="w-3 h-3" />
-          </Link>
-        </div>
-
-        <div className="flex flex-wrap gap-2 mb-4">
-          {newsCategories.map((cat) => (
-            <button
-              key={cat.key}
-              onClick={() => setActiveCategory(cat.key)}
-              className={`px-4 py-2 rounded text-sm font-semibold transition-all whitespace-nowrap ${
-                activeCategory === cat.key
-                  ? 'bg-ahly-red text-white'
-                  : 'bg-gray-200 text-gray-600 hover:bg-gray-300'
-              }`}
-            >
-              {lang === 'ar' ? cat.labelAr : cat.labelEn}
-            </button>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredNews.slice(0, 6).map((news) => (
-            <a
-              key={news.id}
-              href={news.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all hover:-translate-y-1"
-            >
-              <div className="h-40 bg-gradient-to-br from-ahly-red/20 to-ahly-dark/20 relative overflow-hidden">
-                {news.imageUrl ? (
-                  <img src={news.imageUrl} alt={news.title} className="w-full h-full object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <img src={OFFICIAL_LOGO} alt="" className="w-16 h-16 opacity-20" />
-                  </div>
-                )}
-                <div className="absolute top-2 left-2">
-                  <span className={`px-2 py-0.5 rounded text-[10px] font-bold text-white ${
-                    news.category === 'match' ? 'bg-green-600' :
-                    news.category === 'award' ? 'bg-amber-600' :
-                    news.category === 'injury' ? 'bg-red-600' :
-                    'bg-ahly-red'
-                  }`}>
-                    {news.category}
-                  </span>
-                </div>
-              </div>
-              <div className="p-3">
-                <h4 className="text-sm font-bold text-gray-800 line-clamp-2 mb-1">{news.title}</h4>
-                <p className="text-xs text-gray-500 line-clamp-2 mb-2">{news.description}</p>
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] text-gray-400">{news.source}</span>
-                  <span className="text-[10px] text-gray-400">{news.publishedAt.slice(0, 10)}</span>
-                </div>
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
+      {/* Player Auto-Rotation */}
+      <PlayerRotation />
     </section>
   );
 }

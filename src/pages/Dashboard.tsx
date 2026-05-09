@@ -29,6 +29,7 @@ import { useLanguage } from '../context/LanguageContext';
 import { getRecentMatches, getUpcomingMatches, getLiveMatch, getStandings, getTeamStats } from '../services/api';
 import { Match, Standing, TeamStats, MatchEvent } from '../types';
 import FootballFirstTeam from '../components/FootballFirstTeam';
+import TrophyCabinet from '../components/TrophyCabinet';
 
 const OFFICIAL_LOGO = 'https://alahlyegypt.com/_next/image?url=%2Flogo.png&w=320&q=75';
 
@@ -223,6 +224,10 @@ export default function Dashboard() {
 
       <div className="border-t border-ahly-border/30 pt-6">
         <FootballFirstTeam />
+      </div>
+
+      <div className="border-t border-ahly-border/30 pt-6">
+        <TrophyCabinet />
       </div>
 
       <div>
